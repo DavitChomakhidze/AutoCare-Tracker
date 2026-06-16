@@ -6,7 +6,7 @@ import { Badge } from '../components/Badge';
 import { Input } from '../components/Input';
 import { CompactDropdown } from '../components/CompactDropdown';
 import { Modal, ConfirmModal } from '../components/Modal';
-import { AppActions, ServiceRecord, Vehicle, money, vehicleName } from '../data/mockData';
+import { AppActions, ServiceRecord, Vehicle, money, vehicleName } from '../data/appTypes';
 
 const serviceTypeOptions = [
   { value: 'all', label: 'All Service Types' },

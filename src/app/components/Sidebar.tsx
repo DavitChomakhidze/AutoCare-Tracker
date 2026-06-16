@@ -8,7 +8,7 @@ import {
   Settings,
   LogOut
 } from 'lucide-react';
-import { UserProfile } from '../data/mockData';
+import { UserProfile } from '../data/appTypes';
 import { ProfileAvatar } from './ProfileAvatar';
 
 interface NavItem {

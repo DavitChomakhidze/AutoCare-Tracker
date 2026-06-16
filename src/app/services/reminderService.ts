@@ -1,4 +1,4 @@
-import { Reminder } from '../data/mockData';
+import { Reminder } from '../data/appTypes';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/database';
 

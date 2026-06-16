@@ -6,7 +6,7 @@ import { Input } from '../components/Input';
 import { Textarea } from '../components/Textarea';
 import { Checkbox } from '../components/Checkbox';
 import { CompactDropdown } from '../components/CompactDropdown';
-import { AppActions, Reminder, ServiceRecord, Vehicle, money, vehicleName } from '../data/mockData';
+import { AppActions, Reminder, ServiceRecord, Vehicle, money, vehicleName } from '../data/appTypes';
 
 interface Part {
   id: string;

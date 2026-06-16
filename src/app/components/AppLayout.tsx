@@ -3,7 +3,7 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { MobileBottomNav } from './MobileBottomNav';
 import { GlobalSearch } from './GlobalSearch';
-import { AppNotification, Reminder, ServiceRecord, UserProfile, Vehicle } from '../data/mockData';
+import { AppNotification, Reminder, ServiceRecord, UserProfile, Vehicle } from '../data/appTypes';
 
 interface AppLayoutProps {
   children: ReactNode;

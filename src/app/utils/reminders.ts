@@ -1,4 +1,4 @@
-import { Reminder, Vehicle } from '../data/mockData';
+import { Reminder, Vehicle } from '../data/appTypes';
 
 export type ReminderStatus = 'overdue' | 'due-soon' | 'upcoming' | 'completed';
 

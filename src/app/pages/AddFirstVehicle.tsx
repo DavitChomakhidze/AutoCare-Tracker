@@ -2,7 +2,7 @@ import { Car } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { VehicleForm } from '../components/VehicleForm';
-import { AppActions } from '../data/mockData';
+import { AppActions } from '../data/appTypes';
 
 export function AddFirstVehicle({ actions }: { actions: AppActions }) {
   return (

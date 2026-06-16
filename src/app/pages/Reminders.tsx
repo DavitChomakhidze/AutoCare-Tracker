@@ -7,7 +7,7 @@ import { Modal, ConfirmModal } from '../components/Modal';
 import { Input } from '../components/Input';
 import { Textarea } from '../components/Textarea';
 import { CompactDropdown } from '../components/CompactDropdown';
-import { AppActions, Reminder, Vehicle, vehicleName } from '../data/mockData';
+import { AppActions, Reminder, Vehicle, vehicleName } from '../data/appTypes';
 import { ReminderView, getReminderViews, sortByUrgency } from '../utils/reminders';
 
 const reminderTypeOptions = [

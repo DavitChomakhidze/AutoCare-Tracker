@@ -1,7 +1,7 @@
 import { Car, Wrench, DollarSign, Bell } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
-import { AppActions } from '../data/mockData';
+import { AppActions } from '../data/appTypes';
 
 const benefits = [
   {

@@ -1,4 +1,4 @@
-import { Vehicle } from '../data/mockData';
+import { Vehicle } from '../data/appTypes';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/database';
 

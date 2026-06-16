@@ -1,4 +1,4 @@
-import { ServiceRecord, Vehicle } from '../data/mockData';
+import { ServiceRecord, Vehicle } from '../data/appTypes';
 
 export type ExpenseDateRange = '30-days' | '3-months' | '6-months' | 'this-year' | '12-months' | 'all';
 export type ExpenseCategory = 'Maintenance' | 'Repairs' | 'Parts' | 'Tires' | 'Other';

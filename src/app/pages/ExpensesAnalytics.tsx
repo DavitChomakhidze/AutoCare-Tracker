@@ -3,7 +3,7 @@ import { Car, DollarSign, TrendingUp, Download, Wrench } from 'lucide-react';
 import { Card, StatCard } from '../components/Card';
 import { Button } from '../components/Button';
 import { CompactDropdown } from '../components/CompactDropdown';
-import { AppActions, ServiceRecord, Vehicle, vehicleName } from '../data/mockData';
+import { AppActions, ServiceRecord, Vehicle, vehicleName } from '../data/appTypes';
 import {
   BarChart,
   Bar,

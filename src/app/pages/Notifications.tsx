@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Bell, Trash2 } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { AppActions, AppNotification } from '../data/mockData';
+import { AppActions, AppNotification } from '../data/appTypes';
 
 type NotificationTab = 'All' | 'Unread' | 'Maintenance' | 'System';
 

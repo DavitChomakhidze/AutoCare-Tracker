@@ -4,7 +4,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { Modal, ConfirmModal } from '../components/Modal';
-import { AppActions, Reminder, ServiceRecord, Vehicle, money, vehicleName } from '../data/mockData';
+import { AppActions, Reminder, ServiceRecord, Vehicle, money, vehicleName } from '../data/appTypes';
 import { getReminderViews, sortByUrgency } from '../utils/reminders';
 import { countMonthsInRange, formatCurrency, toExpenseRecords } from '../utils/expenses';
 import { VehicleForm } from '../components/VehicleForm';

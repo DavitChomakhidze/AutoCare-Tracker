@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, Bell, Menu } from 'lucide-react';
-import { AppNotification, UserProfile } from '../data/mockData';
+import { AppNotification, UserProfile } from '../data/appTypes';
 import { ProfileAvatar } from './ProfileAvatar';
 
 interface TopBarProps {

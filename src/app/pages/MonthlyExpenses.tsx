@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { CalendarRange, Download, Receipt, TrendingUp, Wrench } from 'lucide-react';
-import { AppActions, ServiceRecord, Vehicle, vehicleName } from '../data/mockData';
+import { AppActions, ServiceRecord, Vehicle, vehicleName } from '../data/appTypes';
 import { Button } from '../components/Button';
 import { Card, StatCard } from '../components/Card';
 import { CompactDropdown } from '../components/CompactDropdown';

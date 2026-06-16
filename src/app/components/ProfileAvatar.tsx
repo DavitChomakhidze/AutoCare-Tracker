@@ -1,4 +1,4 @@
-import { UserProfile } from '../data/mockData';
+import { UserProfile } from '../data/appTypes';
 
 interface ProfileAvatarProps {
   profile: UserProfile;

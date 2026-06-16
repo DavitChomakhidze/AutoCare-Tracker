@@ -7,7 +7,7 @@ import { CompactDropdown } from '../components/CompactDropdown';
 import { Checkbox } from '../components/Checkbox';
 import { ConfirmModal } from '../components/Modal';
 import { ProfileAvatar } from '../components/ProfileAvatar';
-import { AppActions, Reminder, ServiceRecord, UserProfile, Vehicle } from '../data/mockData';
+import { AppActions, Reminder, ServiceRecord, UserProfile, Vehicle } from '../data/appTypes';
 
 const settingsSections = [
   { id: 'profile', label: 'Profile', icon: <User size={20} /> },

@@ -4,7 +4,7 @@ import { Card, StatCard } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { AppActions, Reminder, ServiceRecord, UserProfile, Vehicle, vehicleName } from '../data/mockData';
+import { AppActions, Reminder, ServiceRecord, UserProfile, Vehicle, vehicleName } from '../data/appTypes';
 import { getOverdueReminders, getReminderViews, getUpcomingReminders, sortByUrgency } from '../utils/reminders';
 import { formatCurrency } from '../utils/expenses';
 

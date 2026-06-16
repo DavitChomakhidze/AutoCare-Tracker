@@ -7,7 +7,7 @@ import { Input } from '../components/Input';
 import { Modal, ConfirmModal } from '../components/Modal';
 import { VehicleForm } from '../components/VehicleForm';
 import { CompactDropdown } from '../components/CompactDropdown';
-import { AppActions, Vehicle } from '../data/mockData';
+import { AppActions, Vehicle } from '../data/appTypes';
 
 const statusFilterOptions = [
   { value: 'all', label: 'All Status' },

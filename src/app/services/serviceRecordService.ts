@@ -1,4 +1,4 @@
-import { ServiceRecord } from '../data/mockData';
+import { ServiceRecord } from '../data/appTypes';
 import { supabase } from '../lib/supabase';
 import { Database, Json } from '../types/database';
 

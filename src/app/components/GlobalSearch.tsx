@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Bell, Car, FileText, Search, Settings, Wrench, X } from 'lucide-react';
-import { Page, Reminder, ServiceRecord, Vehicle, vehicleName } from '../data/mockData';
+import { Page, Reminder, ServiceRecord, Vehicle, vehicleName } from '../data/appTypes';
 
 interface GlobalSearchProps {
   isOpen: boolean;

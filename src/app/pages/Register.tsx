@@ -4,7 +4,7 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Checkbox } from '../components/Checkbox';
 import { Card } from '../components/Card';
-import { AppActions } from '../data/mockData';
+import { AppActions } from '../data/appTypes';
 
 export function Register({ actions }: { actions: AppActions }) {
   const [loading, setLoading] = useState(false);

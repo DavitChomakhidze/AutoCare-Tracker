@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { AlertCircle, Calendar, Car, CheckCircle, Gauge, Wrench } from 'lucide-react';
-import { AppActions, Reminder, Vehicle } from '../data/mockData';
+import { AppActions, Reminder, Vehicle } from '../data/appTypes';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { Card, StatCard } from '../components/Card';

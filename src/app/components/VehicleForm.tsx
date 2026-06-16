@@ -3,7 +3,7 @@ import { Input } from './Input';
 import { SearchableDropdown } from './SearchableDropdown';
 import { YearPicker } from './YearPicker';
 import { getManufacturers, getModelsForMake, VehicleMake, VehicleModel } from '../services/vehicleApi';
-import { Vehicle } from '../data/mockData';
+import { Vehicle } from '../data/appTypes';
 
 export interface VehicleFormValues {
   manufacturerId: string;

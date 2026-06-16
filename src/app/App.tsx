@@ -21,7 +21,7 @@ import { Welcome } from './pages/Welcome';
 import { AddFirstVehicle } from './pages/AddFirstVehicle';
 import { Toast } from './components/Toast';
 import { LoadingPage } from './components/LoadingState';
-import { AppActions, AppNotification, Page, Reminder, ServiceRecord, ToastType, UserProfile, Vehicle, vehicleName } from './data/mockData';
+import { AppActions, AppNotification, Page, Reminder, ServiceRecord, ToastType, UserProfile, Vehicle, vehicleName } from './data/appTypes';
 import { authStorageKey, supabase } from './lib/supabase';
 import {
   getProfile,
