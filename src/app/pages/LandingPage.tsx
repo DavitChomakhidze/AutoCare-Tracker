@@ -11,8 +11,11 @@ import {
   BookOpen,
   Mail,
   Lock,
-  FileText
+  FileText,
+  Menu,
+  X
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { AppActions } from '../data/appTypes';
@@ -111,17 +114,63 @@ const contactItems = [
 ];
 
 export function LandingPage({ actions }: { actions: AppActions }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
+
+  const scrollToTop = () => {
+    setMobileMenuOpen(false);
+    if (window.location.pathname !== '/') {
+      actions.navigate('landing');
+      window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
+      return;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    setMobileMenuOpen(false);
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const navigateFromMenu = (page: Parameters<AppActions['navigate']>[0]) => {
+    setMobileMenuOpen(false);
+    actions.navigate(page);
+  };
+
   return (
     <div className="min-h-screen modern-page-bg">
       <header className="border-b border-border/80 bg-card/90 backdrop-blur sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <button
+              type="button"
+              aria-label="Go to AutoCare home"
+              className="flex items-center gap-3 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              onClick={scrollToTop}
+            >
               <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-success-500 rounded-lg flex items-center justify-center text-primary-foreground font-bold shadow-md shadow-primary-600/20">
                 AC
               </div>
               <span className="text-xl font-bold">AutoCare Tracker</span>
-            </div>
+            </button>
 
             <nav className="hidden md:flex items-center gap-6">
               <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -144,14 +193,93 @@ export function LandingPage({ actions }: { actions: AppActions }) {
               </Button>
             </nav>
 
-            <button className="md:hidden text-foreground">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M3 12h18M3 6h18M3 18h18" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+            <button
+              type="button"
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="landing-mobile-navigation"
+              className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg text-foreground hover:bg-accent hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+            >
+              <Menu size={24} />
             </button>
           </div>
         </div>
       </header>
+
+      <div
+        className={`md:hidden fixed inset-0 z-[1000] transition-opacity duration-200 ${
+          mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        aria-hidden={!mobileMenuOpen}
+      >
+        <button
+          type="button"
+          aria-label="Close navigation menu"
+          className="absolute inset-0 h-full w-full bg-black/50"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+        <nav
+          id="landing-mobile-navigation"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation"
+          className={`absolute right-0 top-0 h-full w-80 max-w-[86vw] bg-card p-5 shadow-2xl transition-transform duration-200 ease-out ${
+            mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="mb-8 flex items-center justify-between gap-4">
+            <button
+              type="button"
+              aria-label="Go to AutoCare home"
+              className="flex items-center gap-3 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              onClick={scrollToTop}
+            >
+              <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-success-500 rounded-lg flex items-center justify-center text-primary-foreground font-bold shadow-md shadow-primary-600/20">
+                AC
+              </div>
+              <span className="font-bold">AutoCare</span>
+            </button>
+            <button
+              type="button"
+              aria-label="Close navigation menu"
+              className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground hover:bg-accent"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <X size={22} />
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {[
+              ['features', 'Features'],
+              ['pricing', 'Pricing'],
+              ['faq', 'FAQ'],
+              ['how-it-works', 'How it works'],
+              ['about', 'About'],
+              ['contact', 'Contact']
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className="rounded-lg px-3 py-3 text-left text-foreground hover:bg-accent"
+                onClick={() => scrollToSection(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-6 grid gap-3 border-t border-border pt-6">
+            <Button variant="outline" onClick={() => navigateFromMenu('login')}>
+              Log in
+            </Button>
+            <Button onClick={() => navigateFromMenu('register')}>
+              Get started
+            </Button>
+          </div>
+        </nav>
+      </div>
 
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">

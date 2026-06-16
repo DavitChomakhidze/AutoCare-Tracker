@@ -45,12 +45,17 @@ export function Sidebar({ activeItem, onNavigate, profile, collapsed = false, on
       `}
     >
       <div className="p-6">
-        <div className="flex items-center gap-3">
+        <button
+          type="button"
+          aria-label="Go to dashboard"
+          className={`flex items-center gap-3 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${collapsed ? 'justify-center' : ''}`}
+          onClick={() => onNavigate('dashboard')}
+        >
           <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-success-500 rounded-lg flex items-center justify-center text-primary-foreground font-bold shadow-md shadow-primary-600/20">
             AC
           </div>
           {!collapsed && <h1 className="font-bold text-lg">AutoCare</h1>}
-        </div>
+        </button>
       </div>
 
       <nav className="flex-1 px-3">
