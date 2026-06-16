@@ -130,6 +130,8 @@ export interface Database {
           notes: string | null;
           is_completed: boolean;
           completed_at: string | null;
+          reminder_email_sent_at: string | null;
+          reminder_email_last_status: string | null;
           legacy_status: 'overdue' | 'due-soon' | 'upcoming' | 'completed' | null;
           created_at: string;
           updated_at: string;
@@ -145,6 +147,8 @@ export interface Database {
           notes?: string | null;
           is_completed?: boolean;
           completed_at?: string | null;
+          reminder_email_sent_at?: string | null;
+          reminder_email_last_status?: string | null;
           legacy_status?: 'overdue' | 'due-soon' | 'upcoming' | 'completed' | null;
           created_at?: string;
           updated_at?: string;

@@ -78,11 +78,16 @@ create table if not exists public.reminders (
   notes text,
   is_completed boolean not null default false,
   completed_at timestamptz,
+  reminder_email_sent_at timestamptz,
+  reminder_email_last_status text,
   legacy_status text check (legacy_status is null or legacy_status in ('overdue', 'due-soon', 'upcoming', 'completed')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   check (due_date is not null or due_mileage is not null)
 );
+
+alter table public.reminders add column if not exists reminder_email_sent_at timestamptz;
+alter table public.reminders add column if not exists reminder_email_last_status text;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -190,3 +195,4 @@ create index if not exists reminders_user_id_idx on public.reminders using btree
 create index if not exists reminders_vehicle_id_idx on public.reminders using btree (vehicle_id);
 create index if not exists reminders_due_date_idx on public.reminders using btree (due_date);
 create index if not exists reminders_due_mileage_idx on public.reminders using btree (due_mileage);
+create index if not exists reminders_email_due_idx on public.reminders using btree (is_completed, reminder_email_sent_at, due_date);
