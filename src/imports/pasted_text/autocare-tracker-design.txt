@@ -1,0 +1,1807 @@
+Create a complete, modern, responsive web application UI/UX design for a platform named **AutoCare Tracker**.
+
+AutoCare Tracker is a car maintenance and repair management system. It helps users organize all important information about their vehicles in one place: vehicle details, maintenance history, repairs, replaced parts, expenses, mileage, and future service reminders.
+
+The design must be practical, easy to implement using React and Tailwind CSS, and suitable for a university bachelor project. Build the design using reusable Figma components, variants, Auto Layout, consistent spacing, and a clear design system.
+
+Do not create only a few showcase screens. Create the complete application with every screen, reusable component, state, modal, form, and responsive version needed to implement the product.
+
+---
+
+# 1. PRODUCT GOALS
+
+The application should allow users to:
+
+1. Register and log in securely.
+2. Add and manage one or multiple vehicles.
+3. Record completed maintenance and repair work.
+4. Track replaced parts and related expenses.
+5. Set reminders based on date, vehicle mileage, or both.
+6. View upcoming and overdue maintenance tasks.
+7. Analyze vehicle-related expenses through charts and summary cards.
+8. Use the application comfortably on desktop, tablet, and mobile devices.
+
+The interface should feel reliable and organized. It should not feel overly complex or like professional enterprise fleet-management software. The primary target audience is an everyday car owner managing one or several personal vehicles.
+
+---
+
+# 2. DESIGN STYLE
+
+Use a clean, modern automotive dashboard style.
+
+The visual style should communicate:
+
+* Reliability
+* Safety
+* Simplicity
+* Good organization
+* Professional vehicle maintenance
+* Easy access to important information
+
+Use a light theme as the main version.
+
+Recommended visual direction:
+
+* White and light-gray backgrounds
+* Dark navy or charcoal text
+* Blue as the main action color
+* Green for completed or healthy statuses
+* Orange for upcoming maintenance warnings
+* Red for overdue maintenance or destructive actions
+* Rounded cards with subtle shadows or borders
+* Spacious layouts with clear information hierarchy
+* Clear line icons related to vehicles, tools, calendars, money, charts, and settings
+
+Avoid:
+
+* Excessive gradients
+* Neon colors
+* Overly futuristic designs
+* Heavy animations
+* Crowded dashboards
+* Decorative elements that make implementation difficult
+
+Use a modern sans-serif font such as Inter.
+
+---
+
+# 3. DESIGN SYSTEM PAGE
+
+Create a separate Figma page named **Design System**.
+
+Include all foundations and reusable components.
+
+## 3.1 Color Tokens
+
+Create named color styles:
+
+### Primary
+
+* Primary 50
+* Primary 100
+* Primary 500
+* Primary 600
+* Primary 700
+
+### Neutral
+
+* Neutral 0: white
+* Neutral 50: page background
+* Neutral 100: subtle background
+* Neutral 200: border
+* Neutral 400: placeholder text
+* Neutral 600: secondary text
+* Neutral 800: primary text
+* Neutral 900: headings
+
+### Semantic
+
+* Success 50, 500, 700
+* Warning 50, 500, 700
+* Danger 50, 500, 700
+* Info 50, 500, 700
+
+Use accessible contrast ratios.
+
+## 3.2 Typography Styles
+
+Create named styles:
+
+* Display / Page Title
+* Heading 1
+* Heading 2
+* Heading 3
+* Body Large
+* Body Medium
+* Body Small
+* Label Medium
+* Label Small
+* Caption
+* Button Text
+
+## 3.3 Layout Rules
+
+Use an 8px spacing system.
+
+Recommended spacing scale:
+
+* 4px
+* 8px
+* 12px
+* 16px
+* 20px
+* 24px
+* 32px
+* 40px
+* 48px
+* 64px
+
+Use these layout widths:
+
+* Desktop: 1440px canvas
+* Tablet: 768px canvas
+* Mobile: 390px canvas
+
+Desktop authenticated pages should use:
+
+* Left sidebar: approximately 240px
+* Main content max width: approximately 1200px
+* Page padding: 32px
+* Card radius: 12px
+* Input radius: 8px
+* Button radius: 8px
+
+Mobile pages should use:
+
+* Page padding: 16px
+* Cards stacked vertically
+* Sticky bottom navigation
+* Full-width primary buttons where appropriate
+
+## 3.4 Iconography
+
+Use a consistent line-icon library style.
+
+Include icons for:
+
+* Dashboard
+* Car
+* Wrench
+* Tool
+* Calendar
+* Bell
+* Receipt
+* Dollar or wallet
+* Chart
+* User
+* Settings
+* Log out
+* Plus
+* Search
+* Filter
+* Sort
+* More options
+* Edit
+* Delete
+* Chevron
+* Download
+* Upload
+* Camera
+* Check
+* Warning
+* Error
+* Information
+* Empty state illustration
+* Menu
+* Close
+* Eye show or hide password
+
+---
+
+# 4. REUSABLE COMPONENT LIBRARY
+
+Create a Figma page named **Components**.
+
+Every frequently used element must be a reusable component with variants where necessary.
+
+## 4.1 Buttons
+
+Create button components with these variants:
+
+### Types
+
+* Primary
+* Secondary
+* Outline
+* Ghost
+* Danger
+* Icon-only
+* Text button
+
+### Sizes
+
+* Small
+* Medium
+* Large
+
+### States
+
+* Default
+* Hover
+* Pressed
+* Focused
+* Disabled
+* Loading
+
+Include buttons with optional left or right icons.
+
+Examples:
+
+* Add vehicle
+* Add service record
+* Create reminder
+* Save changes
+* Cancel
+* Delete
+* View details
+* Export report
+
+## 4.2 Form Components
+
+Create reusable form fields:
+
+* Text input
+* Password input with show or hide icon
+* Email input
+* Number input
+* Currency input
+* Mileage input with “km” suffix
+* Date picker
+* Time picker
+* Select dropdown
+* Searchable dropdown
+* Multi-select dropdown
+* Textarea
+* Checkbox
+* Radio button
+* Toggle switch
+* File upload area
+* Vehicle image uploader
+* Search input
+* Tag input
+* Inline editable value
+
+Each input must include:
+
+* Label
+* Optional required indicator
+* Placeholder
+* Helper text
+* Error state
+* Disabled state
+* Filled state
+* Focus state
+
+## 4.3 Navigation Components
+
+Create:
+
+* Desktop sidebar
+* Desktop top bar
+* Tablet collapsed sidebar
+* Mobile header
+* Mobile bottom navigation
+* Breadcrumbs
+* Page tabs
+* Dropdown menu
+* User profile dropdown
+* Notification dropdown
+* Back button
+
+Desktop sidebar items:
+
+1. Dashboard
+2. My Vehicles
+3. Service History
+4. Reminders
+5. Expenses and Analytics
+6. Settings
+
+Place the user profile section and log-out action at the bottom of the sidebar.
+
+Mobile bottom-navigation items:
+
+1. Home
+2. Vehicles
+3. Add
+4. Reminders
+5. More
+
+The central Add button should open a compact action menu:
+
+* Add vehicle
+* Add service record
+* Add reminder
+
+## 4.4 Cards
+
+Create reusable cards:
+
+* Summary statistic card
+* Vehicle card
+* Upcoming reminder card
+* Overdue reminder card
+* Recent activity card
+* Expense summary card
+* Chart container card
+* Empty-state card
+* Service-history card
+* Part item card
+* Mileage card
+* Maintenance-health card
+* Quick-action card
+
+Each card should have variants for desktop and mobile.
+
+## 4.5 Status Components
+
+Create reusable badges:
+
+* Completed
+* Scheduled
+* Upcoming
+* Due soon
+* Overdue
+* Active
+* Archived
+* Draft
+* Paid
+* Cancelled
+
+Use clear semantic colors and optional icons.
+
+Create urgency indicators:
+
+* Healthy
+* Upcoming
+* Needs attention
+* Overdue
+
+## 4.6 Data Components
+
+Create:
+
+* Responsive table
+* Table row
+* Table header
+* Pagination
+* Sort control
+* Filter panel
+* Search and filter toolbar
+* Date-range selector
+* Category filter chips
+* Mobile card-list alternative for tables
+* Chart legend
+* Tooltip
+* Donut chart container
+* Bar-chart container
+* Line-chart container
+* Progress bar
+* Circular progress indicator
+
+## 4.7 Feedback and Overlay Components
+
+Create:
+
+* Toast notifications: success, error, warning, info
+* Inline alert box
+* Confirmation modal
+* Delete confirmation modal
+* Add or edit modal
+* Drawer panel
+* Mobile bottom sheet
+* Loading skeleton
+* Spinner
+* Empty state
+* Error state
+* Offline state
+* 404 state
+* Unsaved-changes confirmation dialog
+
+---
+
+# 5. APPLICATION STRUCTURE
+
+Create a Figma page named **Desktop Screens** and build all desktop screens using a 1440px-wide frame.
+
+Create another page named **Mobile Screens** and design the mobile versions using a 390px-wide frame.
+
+Create a third page named **Tablet Screens** and show the most important responsive tablet layouts using a 768px-wide frame.
+
+---
+
+# 6. PUBLIC AND AUTHENTICATION SCREENS
+
+## 6.1 Landing Page
+
+Create a simple public landing page.
+
+Sections:
+
+### Header
+
+* AutoCare Tracker logo
+* Features navigation link
+* How it works navigation link
+* Log in button
+* Get started button
+
+### Hero Section
+
+* Heading: “Take better care of your car”
+* Supporting text explaining that users can track maintenance, repairs, expenses, and reminders in one place
+* Primary CTA: “Get started for free”
+* Secondary CTA: “Learn more”
+* Right-side dashboard preview illustration or mockup
+
+### Feature Cards
+
+* Track maintenance history
+* Never miss a service
+* Monitor your expenses
+* Manage multiple vehicles
+
+### How It Works
+
+Three simple steps:
+
+1. Add your vehicle
+2. Record services and repairs
+3. Receive maintenance reminders
+
+### Final CTA
+
+* Heading encouraging registration
+* Get started button
+
+### Footer
+
+* Product logo
+* Short description
+* Privacy Policy
+* Terms of Service
+* Contact
+* Copyright
+
+Mobile behavior:
+
+* Replace header links with hamburger menu
+* Stack hero content vertically
+* Stack feature cards vertically or use a two-column layout where space allows
+
+## 6.2 Log In Page
+
+Create a centered authentication card.
+
+Fields:
+
+* Email
+* Password
+* Remember me checkbox
+* Forgot password link
+
+Actions:
+
+* Log in button
+* Link to registration page
+
+Include:
+
+* Form-validation state
+* Incorrect-credentials alert
+* Loading button state
+* Password visibility toggle
+
+## 6.3 Registration Page
+
+Fields:
+
+* Full name
+* Email
+* Password
+* Confirm password
+* Accept Terms and Conditions checkbox
+
+Actions:
+
+* Create account button
+* Link to log-in page
+
+Show validation rules:
+
+* Valid email
+* Minimum password length
+* Passwords match
+* Terms accepted
+
+## 6.4 Forgot Password Page
+
+Fields:
+
+* Email address
+
+Actions:
+
+* Send reset link
+* Back to login
+
+Create a success state informing the user to check their email.
+
+## 6.5 Reset Password Page
+
+Fields:
+
+* New password
+* Confirm password
+
+Actions:
+
+* Update password
+
+Create:
+
+* Successful password-reset state
+* Expired-link error state
+
+## 6.6 Email Verification Page
+
+Show:
+
+* Email icon
+* Message asking the user to verify their email
+* Resend verification email button
+* Back to login link
+
+---
+
+# 7. FIRST-TIME USER ONBOARDING
+
+## 7.1 Welcome Screen
+
+After registration, show a short welcome screen.
+
+Content:
+
+* Friendly heading
+* Brief explanation of the product
+* Three benefits with icons:
+
+  * Organize service history
+  * Track expenses
+  * Receive reminders
+
+Action:
+
+* “Add my first vehicle”
+
+## 7.2 Add First Vehicle Wizard
+
+Use a simple multi-step wizard.
+
+### Step 1: Basic Details
+
+Fields:
+
+* Vehicle manufacturer
+* Model
+* Production year
+* License plate
+* Current mileage in kilometers
+
+### Step 2: Additional Details
+
+Fields:
+
+* VIN, optional
+* Fuel type
+* Transmission type
+* Engine size, optional
+* Vehicle color, optional
+* Vehicle photo, optional
+
+### Step 3: Initial Maintenance Information
+
+Fields:
+
+* Last oil-change date, optional
+* Mileage during last oil change, optional
+* Next inspection date, optional
+* Add first reminder checkbox
+
+### Step 4: Review
+
+Show a summary of the entered information.
+
+Actions:
+
+* Back
+* Save vehicle
+* Skip optional details
+
+Mobile behavior:
+
+* One step per screen
+* Sticky bottom buttons
+
+---
+
+# 8. AUTHENTICATED APPLICATION LAYOUT
+
+## 8.1 Desktop Layout
+
+Create a persistent left sidebar and top bar.
+
+### Sidebar
+
+* Logo at top
+* Navigation links
+* Active navigation state
+* User profile section at bottom
+* Log out icon
+
+### Top Bar
+
+* Breadcrumb or page title
+* Search icon or compact search bar
+* Notification bell with unread badge
+* User avatar
+* Profile dropdown
+
+### Main Content
+
+* Responsive central content container
+* Clear heading and optional supporting description
+* Main page action button aligned to the upper-right side where appropriate
+
+## 8.2 Tablet Layout
+
+* Collapsed sidebar with icons only
+* Expand-button option
+* Reduced padding
+* Charts use one or two columns depending on available width
+
+## 8.3 Mobile Layout
+
+* Top app header with title and notification button
+* Sticky bottom navigation
+* Main content stacked vertically
+* Tables converted into cards
+* Filters opened in bottom sheets
+* Forms use one field per row
+* Primary action button is full width or a floating action button where appropriate
+
+---
+
+# 9. DASHBOARD
+
+Create a dashboard showing a useful overview without overwhelming the user.
+
+## 9.1 Dashboard Header
+
+Content:
+
+* Greeting: “Good morning, David”
+* Supporting text: “Here is an overview of your vehicles”
+* Vehicle selector dropdown when the user has multiple vehicles
+* Primary CTA: “Add service record”
+
+## 9.2 Summary Cards
+
+Create four statistic cards:
+
+1. Total vehicles
+2. Upcoming services
+3. Overdue services
+4. Expenses this month
+
+Each card should include:
+
+* Icon
+* Number
+* Label
+* Optional trend or helper text
+
+## 9.3 Maintenance Overview
+
+Create a large card for the selected vehicle.
+
+Show:
+
+* Vehicle image or illustration
+* Vehicle manufacturer, model, and year
+* License plate
+* Current mileage
+* Maintenance-health status
+* Last service date
+* Next recommended service
+* Progress bar showing distance until next service
+* Button: “View vehicle”
+
+## 9.4 Upcoming Reminders
+
+Show a compact list of upcoming and overdue reminders.
+
+Each reminder row includes:
+
+* Service type
+* Vehicle
+* Due date or due mileage
+* Urgency badge
+* Quick-action button
+* Mark-as-completed option
+
+Show the first four reminders and a “View all reminders” link.
+
+## 9.5 Expense Overview Chart
+
+Show a monthly expenses bar chart for the previous six months.
+
+Include:
+
+* Chart title
+* Vehicle filter
+* Date-range filter
+* Tooltip
+* Total amount
+
+## 9.6 Recent Activity
+
+Show latest completed actions:
+
+* Oil changed
+* New vehicle added
+* Brake pads replaced
+* Reminder created
+
+Each item includes:
+
+* Icon
+* Description
+* Vehicle
+* Date
+* Expense amount where relevant
+
+## 9.7 Dashboard States
+
+Create:
+
+* Normal dashboard with data
+* Empty dashboard for a new user with no vehicle
+* Dashboard with no service records
+* Loading skeleton
+* Error-loading-data state
+
+---
+
+# 10. MY VEHICLES PAGE
+
+## 10.1 Vehicles List Page
+
+Header:
+
+* Title: “My Vehicles”
+* Description
+* Add vehicle button
+* Search input
+* Status filter
+* Sort dropdown
+
+Vehicle cards should show:
+
+* Vehicle image
+* Manufacturer and model
+* Year
+* License plate
+* Current mileage
+* Last service date
+* Next reminder
+* Maintenance-health badge
+* More-options menu
+* View-details button
+
+More-options menu:
+
+* Edit vehicle
+* Add service record
+* Create reminder
+* Archive vehicle
+* Delete vehicle
+
+Layouts:
+
+* Desktop: three-card grid
+* Tablet: two-card grid
+* Mobile: one card per row
+
+Create:
+
+* Default vehicles list
+* Empty state
+* Search-no-results state
+* Archived vehicles filter state
+
+## 10.2 Add Vehicle Page or Modal
+
+Create a full-page form on mobile and either a page or large modal on desktop.
+
+Fields:
+
+* Manufacturer
+* Model
+* Production year
+* License plate
+* Current mileage
+* VIN
+* Fuel type
+* Transmission
+* Engine size
+* Color
+* Photo upload
+* Notes
+
+Actions:
+
+* Save vehicle
+* Cancel
+
+## 10.3 Edit Vehicle Page
+
+Reuse the vehicle form with existing data.
+
+Actions:
+
+* Save changes
+* Cancel
+* Archive vehicle
+* Delete vehicle
+
+Include:
+
+* Delete confirmation modal
+* Unsaved-changes modal
+
+---
+
+# 11. VEHICLE DETAILS PAGE
+
+Create a detailed vehicle page with a top summary and tabbed navigation.
+
+## 11.1 Vehicle Summary Header
+
+Show:
+
+* Vehicle image
+* Manufacturer, model, and production year
+* License plate
+* VIN
+* Current mileage
+* Maintenance-health badge
+* Edit vehicle button
+* Add service record button
+* More-options menu
+
+Tabs:
+
+1. Overview
+2. Service History
+3. Reminders
+4. Expenses
+
+## 11.2 Vehicle Overview Tab
+
+Include:
+
+### Key Details Card
+
+* Mileage
+* Fuel type
+* Transmission
+* Engine
+* VIN
+* Color
+* Date added
+
+### Maintenance Status Card
+
+* Next service
+* Due date
+* Due mileage
+* Distance remaining
+* Progress indicator
+* Create reminder or update reminder action
+
+### Latest Service Card
+
+* Service type
+* Date
+* Mileage
+* Total cost
+* Notes preview
+* View-details button
+
+### Expense Snapshot
+
+* Total expenses
+* Expenses this year
+* Average monthly expense
+* Most expensive category
+
+### Recent Activity Timeline
+
+* Recent records and reminders
+
+## 11.3 Vehicle Service History Tab
+
+Show:
+
+* Add service record button
+* Search
+* Category filter
+* Date-range filter
+* Sort dropdown
+
+Desktop:
+
+* Table view
+
+Columns:
+
+* Date
+* Service type
+* Mileage
+* Workshop
+* Parts count
+* Total cost
+* Status
+* Actions
+
+Mobile:
+
+* Service-record cards instead of a table
+
+## 11.4 Vehicle Reminders Tab
+
+Show reminder cards for the selected vehicle.
+
+Categories:
+
+* Overdue
+* Upcoming
+* Completed
+
+Each reminder card includes:
+
+* Title
+* Reminder type
+* Due date
+* Due mileage
+* Remaining days or kilometers
+* Status badge
+* Mark-completed action
+* Edit action
+
+## 11.5 Vehicle Expenses Tab
+
+Show:
+
+* Total vehicle expense
+* Current-year expense
+* Average monthly expense
+* Highest single repair cost
+
+Charts:
+
+* Monthly-expense bar chart
+* Category donut chart
+* Services-over-time line chart
+
+Show a recent-expenses table beneath the charts.
+
+---
+
+# 12. SERVICE HISTORY MODULE
+
+## 12.1 Global Service History Page
+
+Create a page showing service records across all vehicles.
+
+Header:
+
+* Title: “Service History”
+* Add service record button
+* Search
+* Vehicle filter
+* Service-category filter
+* Date-range selector
+* Sort dropdown
+
+Desktop table columns:
+
+* Date
+* Vehicle
+* Service type
+* Mileage
+* Workshop
+* Cost
+* Status
+* Actions
+
+Mobile:
+
+* Use stacked cards
+
+Actions menu:
+
+* View details
+* Edit
+* Duplicate
+* Delete
+
+## 12.2 Add Service Record Page
+
+Build a clear form divided into sections.
+
+### Section A: Basic Information
+
+Fields:
+
+* Select vehicle
+* Service category
+* Service title
+* Service date
+* Vehicle mileage at service
+* Workshop or mechanic, optional
+* Status: completed or scheduled
+
+Suggested service categories:
+
+* Oil and filter change
+* Routine inspection
+* Engine repair
+* Transmission service
+* Brake service
+* Suspension repair
+* Tire service
+* Battery replacement
+* Cooling system
+* Electrical repair
+* Body repair
+* Other
+
+### Section B: Expense Information
+
+Fields:
+
+* Labor cost
+* Parts cost
+* Additional cost
+* Total cost calculated automatically
+* Currency
+
+### Section C: Parts Used
+
+Allow users to dynamically add multiple parts.
+
+Each part row:
+
+* Part name
+* Brand, optional
+* Quantity
+* Unit price
+* Total price calculated automatically
+* Remove-row icon
+
+Button:
+
+* Add another part
+
+### Section D: Notes and Attachments
+
+Fields:
+
+* Notes textarea
+* Receipt or invoice upload, optional
+* Photo upload, optional
+
+### Section E: Next Service Reminder
+
+Checkbox:
+
+* Create a reminder based on this service
+
+When enabled, reveal:
+
+* Reminder title
+* Reminder due date
+* Reminder mileage
+* Notification preference
+
+Actions:
+
+* Save record
+* Save and add another
+* Cancel
+
+Create:
+
+* Empty form
+* Completed example form
+* Validation-error state
+* Uploading-file state
+* Saving state
+* Save-success toast
+
+## 12.3 Service Record Details Page
+
+Show:
+
+* Service title
+* Status badge
+* Vehicle
+* Service date
+* Mileage
+* Workshop
+* Notes
+* Cost breakdown
+* Parts list
+* Uploaded attachments
+* Associated reminder
+* Edit button
+* Delete button
+
+Include a compact audit-style detail block:
+
+* Created date
+* Last edited date
+
+## 12.4 Edit Service Record Page
+
+Reuse the add-service form with existing values.
+
+Include:
+
+* Save changes
+* Cancel
+* Delete record
+* Delete confirmation modal
+
+---
+
+# 13. REMINDERS MODULE
+
+## 13.1 Reminders List Page
+
+Header:
+
+* Title: “Reminders”
+* Create reminder button
+* Vehicle filter
+* Status filter
+* Date filter
+* Search
+
+Divide the page into three sections:
+
+1. Overdue
+2. Due soon
+3. Later
+
+Each reminder card should include:
+
+* Service icon
+* Reminder title
+* Vehicle name and license plate
+* Trigger type: date, mileage, or both
+* Due date
+* Due mileage
+* Current mileage
+* Remaining days or kilometers
+* Urgency badge
+* Mark as completed button
+* Edit option
+* Delete option
+
+Add a compact toggle:
+
+* Show completed reminders
+
+## 13.2 Create Reminder Page or Modal
+
+Fields:
+
+* Select vehicle
+* Reminder title
+* Service category
+* Reminder type:
+
+  * Date-based
+  * Mileage-based
+  * Date and mileage
+* Due date
+* Due mileage
+* Optional repeating interval:
+
+  * Repeat after a number of months
+  * Repeat after a number of kilometers
+* Notification preference:
+
+  * In-app notification
+  * Email notification
+* Notes
+
+Actions:
+
+* Create reminder
+* Cancel
+
+## 13.3 Edit Reminder Page or Modal
+
+Reuse the same form.
+
+Actions:
+
+* Save changes
+* Mark completed
+* Delete reminder
+* Cancel
+
+## 13.4 Mark Reminder as Completed Flow
+
+When the user marks a reminder as completed, open a modal:
+
+* Ask whether they also want to create a related service record
+* Option 1: Create service record
+* Option 2: Mark completed only
+* Cancel
+
+## 13.5 Reminder States
+
+Create:
+
+* No reminders empty state
+* Due-soon state
+* Overdue state
+* Completed state
+* Reminder-success toast
+* Reminder-delete modal
+
+---
+
+# 14. EXPENSES AND ANALYTICS MODULE
+
+## 14.1 Expenses and Analytics Page
+
+Header:
+
+* Title: “Expenses and Analytics”
+* Date-range selector
+* Vehicle selector
+* Export-report button
+
+Summary cards:
+
+1. Total expenses
+2. Expenses this year
+3. Average monthly expenses
+4. Highest service cost
+
+Charts:
+
+### Monthly Expense Bar Chart
+
+* Expenses by month
+* Tooltip showing exact value
+* Previous six or twelve months
+
+### Expense Category Donut Chart
+
+Categories:
+
+* Maintenance
+* Repairs
+* Parts
+* Tires
+* Inspection
+* Other
+
+### Expenses by Vehicle Chart
+
+* Horizontal bar chart
+* Visible only when multiple vehicles exist
+
+### Service Frequency Line Chart
+
+* Number of services per month
+
+Below the charts, create an expense-records table.
+
+Columns:
+
+* Date
+* Vehicle
+* Category
+* Description
+* Cost
+* Related service
+* Actions
+
+Filters:
+
+* Search
+* Vehicle
+* Category
+* Date range
+* Minimum and maximum amount
+
+Actions:
+
+* View related service
+* Edit related service
+* Export results
+
+## 14.2 Mobile Analytics Layout
+
+On mobile:
+
+* Stack summary cards in a two-column grid
+* Show one chart per card
+* Make charts horizontally scrollable only when necessary
+* Place filters inside a bottom sheet
+* Replace the expense table with expense cards
+
+## 14.3 Export Report Modal
+
+Create a modal with:
+
+* Vehicle selection
+* Date range
+* Include service history checkbox
+* Include expense summary checkbox
+* Include reminder summary checkbox
+* Export-format selector: PDF or CSV
+* Export button
+* Cancel button
+
+---
+
+# 15. NOTIFICATIONS
+
+## 15.1 Desktop Notification Dropdown
+
+Open from the top-bar bell icon.
+
+Show:
+
+* Dropdown heading: “Notifications”
+* Mark-all-as-read action
+* Unread count
+
+Notification examples:
+
+* Oil change is due in 7 days
+* Brake inspection is overdue
+* Reminder created successfully
+* Vehicle mileage reminder is approaching
+
+Each notification includes:
+
+* Icon
+* Title
+* Short description
+* Time
+* Read or unread indicator
+
+Footer:
+
+* View all notifications
+
+## 15.2 Notifications Page
+
+Sections:
+
+* All
+* Unread
+* Maintenance
+* System
+
+Create:
+
+* Notification list
+* Mark-as-read action
+* Delete action
+* Empty state
+
+## 15.3 Mobile Notifications
+
+Use a dedicated full-screen mobile page instead of a small dropdown.
+
+---
+
+# 16. SETTINGS MODULE
+
+## 16.1 Settings Main Page
+
+Use tabs or a side-navigation layout.
+
+Settings sections:
+
+1. Profile
+2. Account Security
+3. Notifications
+4. Preferences
+5. Data and Export
+
+## 16.2 Profile Settings
+
+Fields:
+
+* Profile photo
+* Full name
+* Email
+* Phone number, optional
+
+Actions:
+
+* Save changes
+
+## 16.3 Account Security
+
+Fields and actions:
+
+* Current password
+* New password
+* Confirm new password
+* Change password
+* Log out from all devices
+* Delete account
+
+Include a delete-account confirmation modal requiring the user to enter their password or type a confirmation phrase.
+
+## 16.4 Notification Settings
+
+Toggles:
+
+* In-app reminders
+* Email reminders
+* Due-soon reminders
+* Overdue reminders
+* Monthly expense summary
+
+Optional selector:
+
+* Notify me 1 day, 3 days, 7 days, or 14 days before a date-based reminder
+
+## 16.5 Preferences
+
+Fields:
+
+* Distance unit: kilometers or miles
+* Currency
+* Language
+* Date format
+* Light or dark appearance selector as a future-ready interface element
+
+The main design remains light theme, but make the preference setting visible.
+
+## 16.6 Data and Export
+
+Include:
+
+* Export my data
+* Download service history
+* Download expenses report
+* Delete all stored data
+
+---
+
+# 17. SYSTEM, EMPTY, AND ERROR STATES
+
+Create a separate Figma page named **States and Modals**.
+
+Design all important states.
+
+## 17.1 Empty States
+
+Create empty states for:
+
+* No vehicles
+* No service records
+* No reminders
+* No expenses
+* No notifications
+* No search results
+* No chart data
+
+Each empty state should include:
+
+* Simple illustration or icon
+* Clear title
+* Short helpful description
+* Relevant CTA where appropriate
+
+Examples:
+
+* Add your first vehicle
+* Create reminder
+* Add service record
+* Clear filters
+
+## 17.2 Loading States
+
+Create loading skeletons for:
+
+* Dashboard
+* Vehicles list
+* Vehicle-details page
+* Service-history table
+* Reminder list
+* Analytics charts
+
+## 17.3 Error States
+
+Create:
+
+* Generic page-loading error
+* Network connection error
+* Form submission error
+* File-upload error
+* Authentication error
+* Permission error
+* Session-expired modal
+
+Each state should include a clear retry or next-step action.
+
+## 17.4 Confirmation Dialogs
+
+Create confirmation modals for:
+
+* Delete vehicle
+* Archive vehicle
+* Delete service record
+* Delete reminder
+* Delete account
+* Discard unsaved changes
+* Log out
+
+## 17.5 Special Pages
+
+Create:
+
+* 404 Not Found
+* 500 Server Error
+* Offline page
+
+---
+
+# 18. RESPONSIVE DESIGN REQUIREMENTS
+
+Every important page must work properly on desktop, tablet, and mobile.
+
+Do not simply shrink desktop screens. Reorganize the layouts thoughtfully.
+
+## Desktop: 1440px
+
+* Persistent sidebar
+* Multi-column card grids
+* Tables for structured data
+* Side-by-side charts
+* Inline filters
+
+## Tablet: 768px
+
+* Collapsed sidebar
+* Two-column card layouts
+* Reduced spacing
+* Tables may remain scrollable or partially convert into cards
+* Filters may wrap into multiple rows
+
+## Mobile: 390px
+
+* Mobile header
+* Bottom navigation
+* One-column layout
+* Cards stacked vertically
+* Full-width buttons
+* Forms use one field per row
+* Tables replaced by cards
+* Filter controls moved into bottom sheets
+* Modals become full-screen pages or bottom sheets where appropriate
+* Sticky action bar for save and cancel actions on long forms
+
+Create responsive versions for at least these screens:
+
+1. Landing page
+2. Log in
+3. Register
+4. Dashboard
+5. Vehicles list
+6. Add vehicle
+7. Vehicle overview
+8. Vehicle service history
+9. Global service history
+10. Add service record
+11. Reminders list
+12. Create reminder
+13. Analytics
+14. Settings
+15. Notifications
+
+---
+
+# 19. REALISTIC SAMPLE DATA
+
+Use realistic example content throughout the design.
+
+User:
+
+* Name: David
+* Currency: GEL
+* Distance unit: km
+
+Example vehicles:
+
+### Vehicle 1
+
+* Subaru Forester XT
+* Year: 2004
+* License plate: AA-123-BB
+* Mileage: 281,450 km
+* Status: Needs attention
+
+### Vehicle 2
+
+* Hyundai Elantra
+* Year: 2017
+* License plate: CC-456-DD
+* Mileage: 126,300 km
+* Status: Healthy
+
+Example service records:
+
+* Engine oil and oil-filter replacement
+* Brake-pad replacement
+* Cooling-system inspection
+* Tire replacement
+* Battery replacement
+* Suspension inspection
+* Routine technical inspection
+
+Example reminders:
+
+* Engine oil change due in 600 km
+* Brake-system inspection overdue by 12 days
+* Annual technical inspection due in 18 days
+* Tire rotation due in 2,500 km
+
+Use GEL currency values such as:
+
+* ₾120
+* ₾350
+* ₾780
+* ₾1,450
+
+---
+
+# 20. PROTOTYPE FLOWS
+
+Create clickable prototype connections for these flows.
+
+## Flow 1: New User
+
+Landing page → Register → Verify email → Welcome → Add first vehicle → Dashboard
+
+## Flow 2: Existing User
+
+Login → Dashboard → Select vehicle → Vehicle details → Service history
+
+## Flow 3: Add Maintenance Record
+
+Dashboard → Add service record → Fill form → Add replaced parts → Create related reminder → Save → Success toast → Updated service-history list
+
+## Flow 4: Complete Reminder
+
+Dashboard reminder → Mark completed → Choose create-service-record option → Add service details → Save → Reminder becomes completed
+
+## Flow 5: Expense Analysis
+
+Dashboard → Expenses and Analytics → Choose vehicle → Filter date range → View charts → Export report modal
+
+## Flow 6: Manage Vehicle
+
+My Vehicles → Open vehicle → Edit vehicle → Save changes → Updated vehicle details
+
+---
+
+# 21. FIGMA ORGANIZATION
+
+Create these Figma pages:
+
+1. Cover
+2. Design System
+3. Components
+4. Desktop Screens
+5. Tablet Screens
+6. Mobile Screens
+7. States and Modals
+8. Prototype Flows
+
+Use clear frame names such as:
+
+* Desktop / Dashboard / Default
+* Desktop / Dashboard / Empty
+* Desktop / Vehicles / List
+* Desktop / Vehicle Details / Overview
+* Mobile / Reminders / List
+* Mobile / Service Record / Add
+* Modal / Delete Vehicle
+* Toast / Save Successful
+
+Use Auto Layout for all reusable components and layouts.
+
+Use component properties and variants for:
+
+* Button styles
+* Input states
+* Badge types
+* Card types
+* Navigation active states
+* Reminder urgency
+* Toast types
+* Modal types
+* Responsive card layouts
+
+Create consistent spacing and make the design straightforward to translate into React components and Tailwind CSS classes.
+
+---
+
+# 22. IMPORTANT SCOPE LIMITS
+
+Do not add features outside the planned bachelor-project scope.
+
+Do not design:
+
+* Native Android or iOS apps
+* GPS tracking
+* Real-time vehicle location
+* Artificial-intelligence diagnostics
+* Vehicle telematics integration
+* External vehicle APIs
+* Company fleet administration
+* Admin panels
+* Mechanic dashboards
+* Complex multi-user roles
+* Online appointment booking
+* Online payments
+* Social features
+
+Focus on a polished, complete, realistic personal vehicle maintenance and repair tracking web application.
+
+---
+
+# 23. FINAL OUTPUT EXPECTATIONS
+
+The generated Figma file must include:
+
+* A complete design system
+* Reusable components and variants
+* Every required page
+* Desktop, tablet, and mobile layouts
+* Forms with validation states
+* Empty, loading, success, and error states
+* Confirmation dialogs
+* Charts and analytics components
+* Clickable prototype flows
+* Clear naming conventions
+* Layouts suitable for React and Tailwind CSS implementation
+
+Prioritize completeness, usability, consistent structure, and responsive behavior over decorative complexity.
