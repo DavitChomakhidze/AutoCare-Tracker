@@ -7,6 +7,7 @@ interface TopBarProps {
   title: string;
   breadcrumbs?: string[];
   onMenuClick?: () => void;
+  isMenuOpen?: boolean;
   onNavigate?: (id: string) => void;
   onSearchClick?: () => void;
   profile: UserProfile;
@@ -22,6 +23,7 @@ export function TopBar({
   title,
   breadcrumbs,
   onMenuClick,
+  isMenuOpen = false,
   onNavigate,
   onSearchClick,
   profile,
@@ -40,8 +42,12 @@ export function TopBar({
       <div className="flex items-center gap-4">
         {onMenuClick && (
           <button
+            type="button"
             onClick={onMenuClick}
-            className="lg:hidden text-foreground hover:text-primary"
+            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
+            className="lg:hidden flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-foreground hover:bg-accent hover:text-primary"
           >
             <Menu size={24} />
           </button>

@@ -1,4 +1,5 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { MobileBottomNav } from './MobileBottomNav';
@@ -47,6 +48,24 @@ export function AppLayout({
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
 
+  useEffect(() => {
+    if (!showMobileMenu) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowMobileMenu(false);
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showMobileMenu]);
+
   return (
     <div className="flex h-screen overflow-hidden modern-page-bg">
       <div className="hidden lg:block">
@@ -59,13 +78,34 @@ export function AppLayout({
         />
       </div>
 
-      {showMobileMenu && (
-        <div className="lg:hidden fixed inset-0 z-50">
-          <div
-            className="absolute inset-0 bg-black/50"
+      <div
+        className={`lg:hidden fixed inset-0 z-[1000] transition-opacity duration-200 ${
+          showMobileMenu ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        aria-hidden={!showMobileMenu}
+      >
+        <div
+          className="absolute inset-0 bg-black/50"
+          onClick={() => setShowMobileMenu(false)}
+        />
+        <div
+          role="dialog"
+          id="mobile-navigation"
+          aria-modal="true"
+          aria-label="Mobile navigation"
+          className={`absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-sidebar shadow-2xl transition-transform duration-200 ease-out ${
+            showMobileMenu ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <button
+            type="button"
+            aria-label="Close navigation menu"
+            className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-lg text-sidebar-foreground hover:bg-sidebar-accent/70"
             onClick={() => setShowMobileMenu(false)}
-          />
-          <div className="absolute left-0 top-0 bottom-0">
+          >
+            <X size={22} />
+          </button>
+          <div className="h-full">
             <Sidebar
               activeItem={activeNav}
               profile={profile}
@@ -73,17 +113,21 @@ export function AppLayout({
                 onNavigate(id);
                 setShowMobileMenu(false);
               }}
-              onLogout={onLogout}
+              onLogout={() => {
+                setShowMobileMenu(false);
+                onLogout?.();
+              }}
             />
           </div>
         </div>
-      )}
+      </div>
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar
           title={title}
           breadcrumbs={breadcrumbs}
-          onMenuClick={() => setShowMobileMenu(true)}
+          onMenuClick={() => setShowMobileMenu((current) => !current)}
+          isMenuOpen={showMobileMenu}
           onSearchClick={() => setShowGlobalSearch(true)}
           notifications={notifications}
           notificationReadIds={notificationReadIds}
