@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { Car, CheckCircle } from 'lucide-react';
+import { Car, CheckCircle, FileText, Lock } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Checkbox } from '../components/Checkbox';
 import { Card } from '../components/Card';
+import { Modal } from '../components/Modal';
 import { AppActions } from '../data/appTypes';
+
+type LegalModal = 'terms' | 'privacy' | null;
 
 export function Register({ actions }: { actions: AppActions }) {
   const [loading, setLoading] = useState(false);
@@ -13,13 +16,20 @@ export function Register({ actions }: { actions: AppActions }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [agreementError, setAgreementError] = useState('');
+  const [legalModal, setLegalModal] = useState<LegalModal>(null);
 
   const passwordsMatch = password === confirmPassword && password.length > 0;
   const passwordValid = password.length >= 8;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agreed || !passwordsMatch || !passwordValid) return;
+    if (!passwordsMatch || !passwordValid) return;
+    if (!agreed) {
+      setAgreementError('Please accept the Terms and Conditions before creating an account.');
+      return;
+    }
+
     setLoading(true);
     await actions.register(name, email, password);
     setLoading(false);
@@ -108,20 +118,46 @@ export function Register({ actions }: { actions: AppActions }) {
               label={
                 <span className="text-sm">
                   I agree to the{' '}
-                  <a href="#" className="text-primary hover:underline">
+                  <button
+                    type="button"
+                    className="text-primary hover:underline"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setLegalModal('terms');
+                    }}
+                  >
                     Terms and Conditions
-                  </a>
+                  </button>
+                  {' '}and{' '}
+                  <button
+                    type="button"
+                    className="text-primary hover:underline"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setLegalModal('privacy');
+                    }}
+                  >
+                    Privacy Policy
+                  </button>
                 </span>
               }
               checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
+              onChange={(e) => {
+                setAgreed(e.target.checked);
+                if (e.target.checked) setAgreementError('');
+              }}
             />
+            {agreementError && (
+              <p className="text-sm text-danger-500">{agreementError}</p>
+            )}
 
             <Button
               type="submit"
               className="w-full"
               loading={loading}
-              disabled={!agreed || !passwordsMatch || !passwordValid}
+              disabled={!passwordsMatch || !passwordValid}
             >
               Create account
             </Button>
@@ -141,6 +177,48 @@ export function Register({ actions }: { actions: AppActions }) {
           </div>
         </Card>
       </div>
+
+      <Modal
+        isOpen={legalModal === 'terms'}
+        onClose={() => setLegalModal(null)}
+        title="Terms and Conditions"
+        size="lg"
+        footer={<Button variant="outline" onClick={() => setLegalModal(null)}>Close</Button>}
+      >
+        <div className="space-y-5 text-sm text-muted-foreground leading-6">
+          <div className="flex items-center gap-3 text-foreground">
+            <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
+              <FileText size={20} />
+            </div>
+            <p className="font-medium">Short project terms for using AutoCare Tracker as a personal maintenance management tool.</p>
+          </div>
+          <p><strong className="text-foreground">Use of service:</strong> AutoCare Tracker is intended to help organize maintenance information and should not replace professional mechanical advice.</p>
+          <p><strong className="text-foreground">Accuracy:</strong> users are responsible for entering correct mileage, dates, costs, and vehicle details.</p>
+          <p><strong className="text-foreground">Storage:</strong> authenticated app data is saved through Supabase, while some public landing-page sections are static demo content.</p>
+          <p><strong className="text-foreground">Limitations:</strong> the product does not provide GPS tracking, telematics, AI diagnosis, online payments, or mechanic booking.</p>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={legalModal === 'privacy'}
+        onClose={() => setLegalModal(null)}
+        title="Privacy Policy"
+        size="lg"
+        footer={<Button variant="outline" onClick={() => setLegalModal(null)}>Close</Button>}
+      >
+        <div className="space-y-5 text-sm text-muted-foreground leading-6">
+          <div className="flex items-center gap-3 text-foreground">
+            <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
+              <Lock size={20} />
+            </div>
+            <p className="font-medium">Short project policy for how AutoCare Tracker handles personal vehicle data.</p>
+          </div>
+          <p><strong className="text-foreground">Authentication:</strong> AutoCare uses Supabase Auth for account registration, login, password reset, and session management.</p>
+          <p><strong className="text-foreground">Stored data:</strong> user profile, vehicle, service record, reminder, and avatar data are stored in Supabase.</p>
+          <p><strong className="text-foreground">Purpose:</strong> this data powers dashboards, reminders, analytics, profile settings, and exportable maintenance reports.</p>
+          <p><strong className="text-foreground">Demo content:</strong> some marketing sections, blog previews, pricing examples, and contact messages use static sample content for presentation.</p>
+        </div>
+      </Modal>
     </div>
   );
 }
