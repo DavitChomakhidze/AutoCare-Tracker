@@ -35,7 +35,7 @@ export function TopBar({
   onMarkAllNotificationsRead
 }: TopBarProps) {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
-  const previewNotifications = notifications.slice(0, 4);
+  const previewNotifications = notifications.slice(0, 5);
 
   return (
     <header className="relative z-[200] h-16 bg-card/90 backdrop-blur border-b border-border/80 px-6 flex items-center justify-between shadow-sm">
@@ -107,9 +107,15 @@ export function TopBar({
                   </div>
                 </div>
 
-                <div className="max-h-96 overflow-y-auto">
+                <div>
                   {previewNotifications.length === 0 ? (
-                    <div className="p-6 text-center text-sm text-muted-foreground">No notifications</div>
+                    <div className="p-6 text-center">
+                      <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-neutral-100 text-neutral-400 flex items-center justify-center">
+                        <Bell size={20} />
+                      </div>
+                      <p className="text-sm font-medium">No notifications</p>
+                      <p className="text-xs text-muted-foreground mt-1">You are all caught up.</p>
+                    </div>
                   ) : (
                     previewNotifications.map((notification) => {
                       const isRead = notification.read || notificationReadIds.has(notification.id);
@@ -117,16 +123,18 @@ export function TopBar({
                       return (
                         <button
                           key={notification.id}
-                          className={`w-full p-4 text-left hover:bg-accent cursor-pointer border-b border-border last:border-b-0 ${!isRead ? 'bg-primary-50/50' : ''}`}
+                          className={`w-full p-4 text-left hover:bg-accent cursor-pointer border-b border-border last:border-b-0 ${
+                            isRead ? 'bg-popover/70 opacity-75' : 'bg-primary-50/50'
+                          }`}
                           onClick={() => onMarkNotificationRead(notification.id)}
                         >
                           <div className="flex gap-3">
-                            <div className="w-9 h-9 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0">
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${isRead ? 'bg-neutral-100 text-muted-foreground' : 'bg-primary-50'}`}>
                               {notification.icon}
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-start gap-2">
-                                <p className="text-sm font-medium mb-1 flex-1">{notification.title}</p>
+                                <p className={`text-sm mb-1 flex-1 ${isRead ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'}`}>{notification.title}</p>
                                 {!isRead && <span className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />}
                               </div>
                               <p className="text-xs text-muted-foreground line-clamp-2">{notification.description}</p>
