@@ -103,6 +103,66 @@ function PlaceholderCategories({ message }: { message: string }) {
   );
 }
 
+function escapeHtml(value: string | number | undefined | null) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function reportTable(headers: string[], rows: Array<Array<string | number>>) {
+  return `
+    <table>
+      <thead><tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${rows.length
+          ? rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`).join('')
+          : `<tr><td colspan="${headers.length}">No data available.</td></tr>`}
+      </tbody>
+    </table>
+  `;
+}
+
+function openPrintableReport(title: string, sections: string[]) {
+  const reportWindow = window.open('about:blank', '_blank');
+  if (!reportWindow) return false;
+
+  const html = `
+    <!doctype html>
+    <html>
+      <head>
+        <title>${escapeHtml(title)}</title>
+        <style>
+          body { font-family: Arial, sans-serif; color: #111827; margin: 32px; }
+          h1 { font-size: 24px; margin: 0 0 6px; }
+          h2 { font-size: 16px; margin: 28px 0 10px; }
+          p { color: #4b5563; margin: 0 0 18px; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px; }
+          th, td { border: 1px solid #d1d5db; padding: 8px; text-align: left; vertical-align: top; }
+          th { background: #f3f4f6; font-weight: 700; }
+          .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+          .box { border: 1px solid #d1d5db; border-radius: 8px; padding: 12px; }
+          .box strong { display: block; font-size: 18px; margin-top: 4px; }
+          @media print { body { margin: 18mm; } button { display: none; } }
+        </style>
+      </head>
+      <body onload="window.focus(); setTimeout(function(){ window.print(); }, 250);">
+        <button onclick="window.print()" style="float:right;padding:8px 12px;margin-bottom:16px;">Save as PDF</button>
+        <h1>${escapeHtml(title)}</h1>
+        <p>Generated on ${escapeHtml(new Date().toLocaleDateString())}</p>
+        ${sections.join('')}
+      </body>
+    </html>
+  `;
+
+  reportWindow.document.open();
+  reportWindow.document.write(html);
+  reportWindow.document.close();
+  return true;
+}
+
 export function ExpensesAnalytics({
   actions,
   records,
@@ -158,9 +218,9 @@ export function ExpensesAnalytics({
     .sort((first, second) => new Date(second.date).getTime() - new Date(first.date).getTime())
     .slice(0, 10);
 
-  const exportReport = () => {
+  const exportCsv = () => {
     if (filteredExpenses.length === 0) {
-      actions.toast('warning', 'No expense data available to export.');
+      actions.toast('warning', 'No expense data available to export as CSV.');
       return;
     }
 
@@ -183,10 +243,50 @@ export function ExpensesAnalytics({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `autocare-expenses-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = 'autocare-expenses.csv';
     link.click();
     URL.revokeObjectURL(url);
-    actions.toast('success', 'Expense report exported.');
+    actions.toast('success', 'Expenses CSV exported.');
+  };
+
+  const exportReport = () => {
+    if (filteredExpenses.length === 0) {
+      actions.toast('warning', 'No expense data available to export.');
+      return;
+    }
+
+    const opened = openPrintableReport('autocare-expenses-report.pdf', [
+      `<div class="summary">
+        <div class="box">Total expenses<strong>${escapeHtml(formatCurrency(totalExpenses))}</strong></div>
+        <div class="box">This year<strong>${escapeHtml(formatCurrency(expensesThisYear))}</strong></div>
+        <div class="box">Average monthly<strong>${escapeHtml(formatCurrency(averageMonthly))}</strong></div>
+        <div class="box">Highest service<strong>${escapeHtml(formatCurrency(highestServiceCost))}</strong></div>
+      </div>`,
+      '<h2>Expense Categories</h2>',
+      reportTable(
+        ['Category', 'Amount'],
+        categoryData.map((category) => [category.name, formatCurrency(category.value)])
+      ),
+      '<h2>Expenses by Vehicle</h2>',
+      reportTable(
+        ['Vehicle', 'Amount'],
+        vehicleExpenses.map((vehicle) => [vehicle.name, formatCurrency(vehicle.amount)])
+      ),
+      '<h2>Recent Expenses</h2>',
+      reportTable(
+        ['Date', 'Vehicle', 'Category', 'Service', 'Workshop', 'Cost'],
+        recentExpenses.map((record) => [
+          record.date,
+          record.vehicleName,
+          record.expenseCategory,
+          record.type || record.notes || 'Service expense',
+          record.workshop,
+          formatCurrency(record.cost)
+        ])
+      )
+    ]);
+
+    actions.toast(opened ? 'success' : 'error', opened ? 'PDF report opened. Choose Save as PDF in the print dialog.' : 'Could not open PDF report window.');
   };
 
   return (
@@ -196,10 +296,16 @@ export function ExpensesAnalytics({
           <h1 className="text-3xl font-semibold mb-2">Expenses & Analytics</h1>
           <p className="text-muted-foreground">Track and analyze your vehicle expenses</p>
         </div>
-        <Button variant="outline" onClick={exportReport} className="w-full sm:w-auto">
-          <Download size={18} />
-          Export report
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button variant="outline" onClick={exportCsv} className="w-full sm:w-auto">
+            <Download size={18} />
+            Export CSV
+          </Button>
+          <Button variant="outline" onClick={exportReport} className="w-full sm:w-auto">
+            <Download size={18} />
+            Export report
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:w-[520px]">

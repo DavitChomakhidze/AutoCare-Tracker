@@ -283,7 +283,7 @@ export function Settings({
       [header, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n'),
       'text/csv;charset=utf-8;'
     );
-    actions.toast('success', 'Expense report downloaded.');
+    actions.toast('success', 'Expenses CSV downloaded.');
   };
 
   const exportAllDataPdf = () => {

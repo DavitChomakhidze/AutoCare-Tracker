@@ -104,7 +104,7 @@ export function MonthlyExpenses({
           <CompactDropdown options={monthOptions} value={selectedMonth} onChange={setSelectedMonth} />
           <Button variant="outline" onClick={() => setShowExport(true)}>
             <Download size={18} />
-            Export
+            Export CSV
           </Button>
         </div>
       </div>
@@ -199,7 +199,7 @@ export function MonthlyExpenses({
       <Modal
         isOpen={showExport}
         onClose={() => setShowExport(false)}
-        title="Export monthly expenses"
+        title="Export monthly expenses CSV"
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Button variant="outline" onClick={() => setShowExport(false)}>Cancel</Button>
@@ -215,7 +215,7 @@ export function MonthlyExpenses({
         }
       >
         <p className="text-sm text-muted-foreground">
-          Export {monthLabel(selectedMonth)} expenses with related service records, vehicle totals, and category summary.
+          Export {monthLabel(selectedMonth)} expenses as a CSV with related service records, vehicle totals, and category summary.
         </p>
       </Modal>
     </div>
