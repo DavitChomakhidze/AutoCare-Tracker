@@ -116,6 +116,11 @@ function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : 'Something went wrong.';
 }
 
+function isAuthRateLimitError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  return /rate limit|too many|429/i.test(error.message);
+}
+
 function isNetworkError(error: unknown) {
   if (!(error instanceof Error)) return false;
   return /failed to fetch|network|connection|err_connection/i.test(error.message);
@@ -489,7 +494,13 @@ export default function App() {
           setToast({ type: 'success', message: 'Welcome back.' });
           return true;
         } catch (error) {
-          setToast({ type: 'error', message: `Login failed: ${errorMessage(error)}` });
+          console.warn('Supabase login failed', error);
+          setToast({
+            type: 'error',
+            message: isAuthRateLimitError(error)
+              ? 'Too many login attempts. Please wait a moment and try again.'
+              : 'Invalid email or password.'
+          });
           return false;
         }
       },

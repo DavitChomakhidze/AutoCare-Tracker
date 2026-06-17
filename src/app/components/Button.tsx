@@ -23,7 +23,7 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = 'inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] font-medium transition-all focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+  const baseStyles = 'inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] font-medium transition-all focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantStyles = {
     primary: 'bg-gradient-to-r from-primary-600 to-info-500 text-primary-foreground shadow-md shadow-primary-600/20 hover:shadow-lg hover:shadow-primary-600/25 hover:-translate-y-0.5',
