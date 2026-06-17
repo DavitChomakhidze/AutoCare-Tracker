@@ -24,7 +24,7 @@ import { AddFirstVehicle } from './pages/AddFirstVehicle';
 import { Toast } from './components/Toast';
 import { LoadingPage } from './components/LoadingState';
 import { AppActions, AppNotification, Page, Reminder, ServiceRecord, ToastType, UserProfile, Vehicle, vehicleName } from './data/appTypes';
-import { authStorageKey, supabase } from './lib/supabase';
+import { authStorageKey, clearAuthRememberPreference, setAuthRememberPreference, supabase } from './lib/supabase';
 import {
   getProfile,
   repairOversizedAuthMetadata,
@@ -150,6 +150,16 @@ function clearLocalSupabaseAuthTokens({ includeCurrentKey = false } = {}) {
       }
 
       localStorage.removeItem(key);
+    });
+
+  Object.keys(sessionStorage)
+    .filter((key) => key.startsWith('sb-') && key.endsWith('-auth-token'))
+    .forEach((key) => {
+      if (key === authStorageKey && !includeCurrentKey) {
+        return;
+      }
+
+      sessionStorage.removeItem(key);
     });
 }
 
@@ -506,8 +516,9 @@ export default function App() {
         setCurrentPage('vehicle-details');
         window.history.pushState({ page: 'vehicle-details', vehicleId }, '', `/vehicles/${encodeURIComponent(vehicleId)}`);
       },
-      login: async (email, password) => {
+      login: async (email, password, rememberMe = false) => {
         try {
+          setAuthRememberPreference(rememberMe);
           const data = await signIn(email, password);
           const repairedSession = sessionHasOversizedAuthHeader(data.session) ? await repairOversizedAuthMetadata() : data.session;
           if (repairedSession) {
@@ -519,6 +530,7 @@ export default function App() {
           setToast({ type: 'success', message: 'Welcome back.' });
           return true;
         } catch (error) {
+          setAuthRememberPreference(false);
           console.warn('Supabase login failed', error);
           setToast({
             type: 'error',
@@ -642,6 +654,7 @@ export default function App() {
         setSelectedVehicleId('');
         setAccountProfile(null);
         clearLocalSupabaseAuthTokens({ includeCurrentKey: true });
+        clearAuthRememberPreference();
         showPage('landing');
         if (signedOut) setToast({ type: 'info', message: 'You have been logged out from all devices.' });
         return signedOut;
@@ -679,6 +692,7 @@ export default function App() {
         setAccountProfile(null);
         setSelectedVehicleId('');
         clearLocalSupabaseAuthTokens({ includeCurrentKey: true });
+        clearAuthRememberPreference();
         showPage('landing');
         if (signedOut) setToast({ type: 'info', message: 'You have been logged out.' });
       },

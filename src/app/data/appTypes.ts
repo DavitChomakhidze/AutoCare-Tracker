@@ -33,7 +33,7 @@ export interface UserProfile {
 export interface AppActions {
   navigate: (page: Page) => void;
   openVehicleDetails: (vehicleId: string) => void;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   resetPassword: (email: string) => Promise<boolean>;
   updateRecoveredPassword: (newPassword: string) => Promise<boolean>;

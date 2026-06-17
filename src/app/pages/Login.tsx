@@ -9,6 +9,7 @@ import { AppActions } from '../data/appTypes';
 const maxFailedLoginAttempts = 5;
 const loginLockoutMs = 5 * 60 * 1000;
 const loginAttemptStorageKey = 'autocare-login-attempts';
+const rememberedEmailStorageKey = 'autocare-remembered-email';
 
 // This browser-session lockout improves UX and reduces accidental repeated attempts.
 // Real brute-force protection must be enforced by Supabase/Auth server-side rate limiting.
@@ -69,10 +70,36 @@ function formatRemainingTime(milliseconds: number) {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
+function readRememberedEmail() {
+  try {
+    return localStorage.getItem(rememberedEmailStorageKey) || '';
+  } catch {
+    return '';
+  }
+}
+
+function saveRememberedEmail(email: string) {
+  try {
+    localStorage.setItem(rememberedEmailStorageKey, email);
+  } catch {
+    // Remember me stores only the email for convenience. Passwords are never stored or prefilled.
+  }
+}
+
+function clearRememberedEmail() {
+  try {
+    localStorage.removeItem(rememberedEmailStorageKey);
+  } catch {
+    // Remember me stores only the email for convenience. Passwords are never stored or prefilled.
+  }
+}
+
 export function Login({ actions }: { actions: AppActions }) {
+  const rememberedEmail = readRememberedEmail();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(rememberedEmail);
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(Boolean(rememberedEmail));
   const [attemptState, setAttemptState] = useState<LoginAttemptState>(() => readLoginAttemptState());
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const isLocked = attemptState.lockedUntil > currentTime;
@@ -117,10 +144,16 @@ export function Login({ actions }: { actions: AppActions }) {
     if (isLocked) return;
 
     setLoading(true);
-    const loggedIn = await actions.login(email, password);
+    const loggedIn = await actions.login(email, password, rememberMe);
     setLoading(false);
 
     if (loggedIn) {
+      if (rememberMe) {
+        saveRememberedEmail(email.trim());
+      } else {
+        clearRememberedEmail();
+      }
+
       clearFailedLoginAttempts();
       return;
     }
@@ -160,7 +193,14 @@ export function Login({ actions }: { actions: AppActions }) {
             />
 
             <div className="flex items-center justify-between">
-              <Checkbox label="Remember me" />
+              <Checkbox
+                label="Remember me"
+                checked={rememberMe}
+                onChange={(event) => {
+                  setRememberMe(event.target.checked);
+                  if (!event.target.checked) clearRememberedEmail();
+                }}
+              />
               <button
                 type="button"
                 onClick={() => actions.navigate('forgot-password')}
