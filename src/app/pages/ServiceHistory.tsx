@@ -287,6 +287,18 @@ export function ServiceHistory({
               <div><span className="text-muted-foreground">Workshop:</span> {selectedRecord.workshop}</div>
               <div><span className="text-muted-foreground">Total cost:</span> {money(selectedRecord.cost)}</div>
             </div>
+            {selectedRecord.receiptFileName && (
+              <div className="rounded-lg border border-border bg-neutral-50 p-3 text-sm">
+                <span className="text-muted-foreground">Receipt:</span>{' '}
+                {selectedRecord.receiptUrl ? (
+                  <a href={selectedRecord.receiptUrl} target="_blank" rel="noreferrer" className="font-medium text-primary hover:underline">
+                    {selectedRecord.receiptFileName}
+                  </a>
+                ) : (
+                  <span className="font-medium">{selectedRecord.receiptFileName}</span>
+                )}
+              </div>
+            )}
             <p className="text-sm text-muted-foreground">{selectedRecord.notes}</p>
           </div>
         )}

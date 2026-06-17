@@ -53,7 +53,7 @@ const pricingPlans = [
   },
   {
     name: 'Personal',
-    price: '₾9',
+    price: 'GEL9',
     period: '/ month',
     description: 'For owners who maintain multiple personal vehicles.',
     features: ['Up to 5 vehicles', 'Date and mileage reminders', 'Expense analytics', 'Export reports'],
@@ -62,7 +62,7 @@ const pricingPlans = [
   },
   {
     name: 'Family',
-    price: '₾19',
+    price: 'GEL19',
     period: '/ month',
     description: 'For households that share vehicle maintenance tasks.',
     features: ['Up to 12 vehicles', 'Shared service records', 'Advanced notifications', 'Priority support'],
@@ -328,7 +328,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
                   </div>
                   <div className="rounded-lg bg-success-50 p-4">
                     <p className="text-xs text-success-700 mb-1">This month</p>
-                    <p className="font-semibold">₾420</p>
+                    <p className="font-semibold">GEL420</p>
                   </div>
                   <div className="rounded-lg bg-info-50 p-4">
                     <p className="text-xs text-info-700 mb-1">Vehicles</p>
@@ -634,16 +634,16 @@ export function LandingPage({ actions }: { actions: AppActions }) {
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-3">Privacy Policy</h2>
               <p className="text-muted-foreground">
-                Prototype policy for how AutoCare Tracker would handle personal vehicle data.
+                Short project policy for how AutoCare Tracker handles personal vehicle data.
               </p>
             </div>
           </div>
           <Card padding="lg">
             <div className="space-y-5 text-sm text-muted-foreground leading-6">
-              <p><strong className="text-foreground">Data collected:</strong> account details, vehicle information, service records, reminders, expense values, and uploaded maintenance notes.</p>
-              <p><strong className="text-foreground">Purpose:</strong> data is used to show dashboards, reminders, analytics, and exportable maintenance reports.</p>
-              <p><strong className="text-foreground">Storage:</strong> this frontend prototype uses local sample data only. A production version would store data securely through a backend such as Supabase.</p>
-              <p><strong className="text-foreground">User control:</strong> users should be able to export, update, and delete their stored data from account settings.</p>
+              <p><strong className="text-foreground">Authentication:</strong> AutoCare uses Supabase Auth for account registration, login, password reset, and session management.</p>
+              <p><strong className="text-foreground">Stored data:</strong> user profile, vehicle, service record, reminder, and avatar data are stored in Supabase.</p>
+              <p><strong className="text-foreground">Purpose:</strong> this data powers dashboards, reminders, analytics, profile settings, and exportable maintenance reports.</p>
+              <p><strong className="text-foreground">Demo content:</strong> some marketing sections, blog previews, pricing examples, and contact messages use static sample content for presentation.</p>
             </div>
           </Card>
         </div>
@@ -658,7 +658,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-3">Terms of Service</h2>
               <p className="text-muted-foreground">
-                Prototype terms for using AutoCare Tracker as a personal maintenance management tool.
+                Short project terms for using AutoCare Tracker as a personal maintenance management tool.
               </p>
             </div>
           </div>
@@ -666,7 +666,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
             <div className="space-y-5 text-sm text-muted-foreground leading-6">
               <p><strong className="text-foreground">Use of service:</strong> AutoCare Tracker is intended to help organize maintenance information and should not replace professional mechanical advice.</p>
               <p><strong className="text-foreground">Accuracy:</strong> users are responsible for entering correct mileage, dates, costs, and vehicle details.</p>
-              <p><strong className="text-foreground">Availability:</strong> this is a frontend prototype, so persistence and production uptime are outside the current implementation scope.</p>
+              <p><strong className="text-foreground">Storage:</strong> authenticated app data is saved through Supabase, while some public landing-page sections are static demo content.</p>
               <p><strong className="text-foreground">Limitations:</strong> the product does not provide GPS tracking, telematics, AI diagnosis, online payments, or mechanic booking.</p>
             </div>
           </Card>

@@ -1685,10 +1685,10 @@ Example reminders:
 
 Use GEL currency values such as:
 
-* ₾120
-* ₾350
-* ₾780
-* ₾1,450
+* GEL120
+* GEL350
+* GEL780
+* GEL1,450
 
 ---
 

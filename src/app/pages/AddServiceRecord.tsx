@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Car, Plus, X } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -30,6 +30,8 @@ const serviceCategories = [
   { value: 'body', label: 'Body repair', category: 'Repairs' },
   { value: 'other', label: 'Other', category: 'Other' }
 ];
+const allowedReceiptTypes = new Set(['image/png', 'image/jpeg', 'image/webp', 'application/pdf']);
+const receiptMaxBytes = 5 * 1024 * 1024;
 
 const initialForm = {
   vehicleId: 'subaru',
@@ -63,6 +65,11 @@ export function AddServiceRecord({
   const [createReminder, setCreateReminder] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form | 'totalCost', string>>>({});
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptPath, setReceiptPath] = useState<string | null>(null);
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
+  const [receiptFileName, setReceiptFileName] = useState<string | null>(null);
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
   const selectedVehicle = vehicles.find((vehicle) => vehicle.id === form.vehicleId) || vehicles[0];
   const selectedCategory = serviceCategories.find((category) => category.value === form.category) || serviceCategories[0];
@@ -113,6 +120,10 @@ export function AddServiceRecord({
       reminderDueMileage: ''
     });
     setParts(editingRecord.parts.map((part, index) => ({ ...part, id: `${editingRecord.id}-part-${index}` })));
+    setReceiptFile(null);
+    setReceiptPath(editingRecord.receiptPath || null);
+    setReceiptUrl(editingRecord.receiptUrl || null);
+    setReceiptFileName(editingRecord.receiptFileName || null);
     setCreateReminder(false);
     setErrors({});
   }, [editingRecord]);
@@ -137,8 +148,41 @@ export function AddServiceRecord({
   const resetForm = () => {
     setForm(initialForm);
     setParts([]);
+    setReceiptFile(null);
+    setReceiptPath(null);
+    setReceiptUrl(null);
+    setReceiptFileName(null);
     setCreateReminder(false);
     setErrors({});
+  };
+
+  const handleReceiptChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!allowedReceiptTypes.has(file.type)) {
+      event.target.value = '';
+      actions.toast('error', 'Receipt must be a PNG, JPG, JPEG, WEBP, or PDF file.');
+      return;
+    }
+
+    if (file.size > receiptMaxBytes) {
+      event.target.value = '';
+      actions.toast('error', 'Receipt must be 5MB or smaller.');
+      return;
+    }
+
+    setReceiptFile(file);
+    setReceiptFileName(file.name);
+    setReceiptPath(null);
+    setReceiptUrl(null);
+  };
+
+  const removeReceipt = () => {
+    setReceiptFile(null);
+    setReceiptPath(null);
+    setReceiptUrl(null);
+    setReceiptFileName(null);
   };
 
   if (vehicles.length === 0) {
@@ -201,8 +245,32 @@ export function AddServiceRecord({
       return;
     }
 
+    const recordId = editingRecord?.id || `srv-${Date.now()}`;
+    let nextReceiptPath = receiptPath;
+    let nextReceiptUrl = receiptUrl;
+    let nextReceiptFileName = receiptFileName;
+
+    if (receiptFile) {
+      setUploadingReceipt(true);
+      const uploadedReceipt = await actions.uploadServiceReceipt(receiptFile, recordId);
+      setUploadingReceipt(false);
+
+      if (!uploadedReceipt) {
+        actions.toast('warning', 'Receipt upload failed. Remove the selected receipt to save this record without it, or try saving again.');
+        return;
+      }
+
+      nextReceiptPath = uploadedReceipt.path;
+      nextReceiptUrl = uploadedReceipt.url;
+      nextReceiptFileName = uploadedReceipt.fileName;
+      setReceiptPath(nextReceiptPath);
+      setReceiptUrl(nextReceiptUrl);
+      setReceiptFileName(nextReceiptFileName);
+      setReceiptFile(null);
+    }
+
     const record: ServiceRecord = {
-      id: editingRecord?.id || `srv-${Date.now()}`,
+      id: recordId,
       date: form.date || new Date().toISOString().slice(0, 10),
       vehicleId: selectedVehicle.id,
       vehicle: vehicleName(selectedVehicle),
@@ -218,6 +286,9 @@ export function AddServiceRecord({
       status: form.status,
       notes: form.notes.trim() || 'No notes added.',
       createdAt: editingRecord?.createdAt || new Date().toISOString(),
+      receiptPath: nextReceiptPath,
+      receiptUrl: nextReceiptUrl,
+      receiptFileName: nextReceiptFileName,
       parts: parts
         .filter((part) => part.name.trim())
         .map((part) => ({
@@ -360,7 +431,7 @@ export function AddServiceRecord({
             label="Labor cost"
             type="number"
             placeholder="0"
-            leftIcon={<span>₾</span>}
+            leftIcon={<span>GEL</span>}
             value={form.laborCost}
             onChange={(event) => updateForm('laborCost', event.target.value)}
           />
@@ -368,7 +439,7 @@ export function AddServiceRecord({
             label="Parts cost"
             type="number"
             placeholder="0"
-            leftIcon={<span>₾</span>}
+            leftIcon={<span>GEL</span>}
             value={form.partsCost}
             onChange={(event) => updateForm('partsCost', event.target.value)}
             helperText={dynamicPartsCost > 0 ? `Parts rows add ${money(dynamicPartsCost)} more` : undefined}
@@ -377,7 +448,7 @@ export function AddServiceRecord({
             label="Additional cost"
             type="number"
             placeholder="0"
-            leftIcon={<span>₾</span>}
+            leftIcon={<span>GEL</span>}
             value={form.additionalCost}
             onChange={(event) => updateForm('additionalCost', event.target.value)}
           />
@@ -443,7 +514,7 @@ export function AddServiceRecord({
                   <Input
                     type="number"
                     placeholder="Unit price"
-                    leftIcon={<span>₾</span>}
+                    leftIcon={<span>GEL</span>}
                     value={part.unitPrice}
                     onFocus={() => {
                       if (part.unitPrice !== 0) return;
@@ -485,10 +556,41 @@ export function AddServiceRecord({
             <label className="block text-sm font-medium text-foreground mb-1.5">
               Receipt or invoice (optional)
             </label>
-            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
-              <p className="text-sm text-muted-foreground">Click to upload or drag and drop</p>
-              <p className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG up to 10MB</p>
-            </div>
+            <label className="block border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,application/pdf"
+                className="sr-only"
+                onChange={handleReceiptChange}
+              />
+              <p className="text-sm text-muted-foreground">Click to upload a receipt or invoice</p>
+              <p className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG, WEBP up to 5MB</p>
+            </label>
+            {receiptFileName && (
+              <div className="mt-3 flex flex-col gap-2 rounded-lg border border-border bg-neutral-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium">{receiptFileName}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {receiptFile ? 'Selected for upload when you save.' : receiptUrl ? 'Uploaded receipt attached.' : 'Receipt attached.'}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  {receiptUrl && !receiptFile && (
+                    <a
+                      href={receiptUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-8 items-center justify-center rounded-[var(--radius-button)] px-3 text-sm font-medium text-primary hover:bg-primary-50"
+                    >
+                      View
+                    </a>
+                  )}
+                  <Button variant="ghost" size="sm" onClick={removeReceipt}>
+                    Remove
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -535,8 +637,8 @@ export function AddServiceRecord({
             Save and add another
           </Button>
         )}
-        <Button onClick={() => saveRecord(false)}>
-          {editingRecord ? 'Save changes' : 'Save record'}
+        <Button onClick={() => saveRecord(false)} loading={uploadingReceipt}>
+          {uploadingReceipt ? 'Uploading receipt...' : editingRecord ? 'Save changes' : 'Save record'}
         </Button>
       </div>
     </div>

@@ -40,6 +40,7 @@ import {
   createServiceRecord,
   deleteServiceRecord,
   getServiceRecords,
+  uploadServiceReceipt,
   updateServiceRecord
 } from './services/serviceRecordService';
 import {
@@ -465,7 +466,17 @@ export default function App() {
         try {
           return await uploadAvatar(session.user.id, file);
         } catch (error) {
+          console.error('Avatar upload failed', error);
           setToast({ type: 'error', message: `Photo could not be uploaded: ${errorMessage(error)}` });
+          return null;
+        }
+      },
+      uploadServiceReceipt: async (file, serviceRecordId) => {
+        if (!session) return null;
+        try {
+          return await uploadServiceReceipt(session.user.id, serviceRecordId, file);
+        } catch (error) {
+          setToast({ type: 'error', message: `Receipt could not be uploaded: ${errorMessage(error)}` });
           return null;
         }
       },
@@ -477,6 +488,7 @@ export default function App() {
           setToast({ type: 'success', message: 'Profile changes saved.' });
           return true;
         } catch (error) {
+          console.error('Profile update failed', error);
           setToast({ type: 'error', message: `Profile could not be updated: ${errorMessage(error)}` });
           return false;
         }

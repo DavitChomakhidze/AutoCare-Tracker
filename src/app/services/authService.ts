@@ -9,6 +9,13 @@ type AuthJwtPayload = {
 };
 
 const authImageMetadataKeys = ['avatar_url', 'picture', 'image'];
+const avatarMaxBytes = 2 * 1024 * 1024;
+const allowedAvatarTypes = new Set(['image/png', 'image/jpeg', 'image/webp']);
+const avatarExtensions: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp'
+};
 
 function decodeJwtPayload(accessToken: string): AuthJwtPayload | null {
   const payloadPart = accessToken.split('.')[1];
@@ -25,6 +32,16 @@ function decodeJwtPayload(accessToken: string): AuthJwtPayload | null {
 
 function isUnsafeMetadataImage(value: unknown) {
   return typeof value === 'string' && (value.includes('data:image') || value.length > 1000);
+}
+
+function validateAvatarFile(file: File) {
+  if (!allowedAvatarTypes.has(file.type)) {
+    throw new Error('Profile photo must be a PNG, JPG, JPEG, or WEBP image.');
+  }
+
+  if (file.size > avatarMaxBytes) {
+    throw new Error('Profile photo must be 2MB or smaller.');
+  }
 }
 
 export async function repairOversizedAuthMetadata() {
@@ -111,16 +128,32 @@ export async function updateProfile(userId: string, displayName: string, email: 
 
   if (userError) throw userError;
 
+  const profilePayload: Database['public']['Tables']['profiles']['Insert'] = {
+    id: userId,
+    display_name: displayName,
+    avatar_url: avatarUrl || null
+  };
+
   const { error: profileError } = await supabase
     .from('profiles')
-    .upsert({ id: userId, display_name: displayName, avatar_url: avatarUrl || null }, { onConflict: 'id' });
+    .upsert(profilePayload, { onConflict: 'id' });
 
-  if (profileError) throw profileError;
+  if (profileError) {
+    console.error('Supabase profile update failed', {
+      message: profileError.message,
+      code: profileError.code,
+      details: profileError.details,
+      hint: profileError.hint
+    });
+    throw profileError;
+  }
   return userData;
 }
 
 export async function uploadAvatar(userId: string, file: File) {
-  const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  validateAvatarFile(file);
+
+  const extension = avatarExtensions[file.type] || 'jpg';
   const path = `${userId}/avatar-${Date.now()}.${extension}`;
   const { error } = await supabase.storage
     .from('avatars')

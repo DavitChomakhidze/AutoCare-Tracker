@@ -24,6 +24,8 @@ const defaultNotificationPrefs = {
   overdue: true,
   monthlySummary: false
 };
+const allowedAvatarTypes = new Set(['image/png', 'image/jpeg', 'image/webp']);
+const avatarMaxBytes = 2 * 1024 * 1024;
 
 function downloadFile(filename: string, content: string, type = 'application/json') {
   const blob = new Blob([content], { type });
@@ -163,7 +165,15 @@ export function Settings({
   const handlePhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
+
+    if (!allowedAvatarTypes.has(file.type)) {
+      event.target.value = '';
+      actions.toast('error', 'Photo must be a PNG, JPG, JPEG, or WEBP image.');
+      return;
+    }
+
+    if (file.size > avatarMaxBytes) {
+      event.target.value = '';
       actions.toast('error', 'Photo must be 2MB or smaller.');
       return;
     }
@@ -395,9 +405,9 @@ export function Settings({
                   <div>
                     <label className="inline-flex h-8 px-3 text-sm items-center justify-center rounded-[var(--radius-button)] border-2 border-border bg-card/80 hover:bg-accent hover:border-primary-500/30 cursor-pointer font-medium">
                       {uploadingPhoto ? 'Uploading...' : 'Change photo'}
-                      <input type="file" accept="image/png,image/jpeg,image/gif" className="sr-only" onChange={handlePhotoChange} />
+                      <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={handlePhotoChange} />
                     </label>
-                    <p className="text-xs text-muted-foreground mt-2">JPG, PNG or GIF (max. 2MB)</p>
+                    <p className="text-xs text-muted-foreground mt-2">JPG, PNG or WEBP (max. 2MB)</p>
                   </div>
                 </div>
 

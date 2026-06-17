@@ -91,6 +91,8 @@ export interface Database {
           total_cost: number;
           status: 'completed' | 'scheduled';
           notes: string;
+          receipt_path: string | null;
+          receipt_file_name: string | null;
           parts: Json;
           created_at: string;
           updated_at: string;
@@ -112,6 +114,8 @@ export interface Database {
           total_cost?: number;
           status?: 'completed' | 'scheduled';
           notes?: string;
+          receipt_path?: string | null;
+          receipt_file_name?: string | null;
           parts?: Json;
           created_at?: string;
           updated_at?: string;

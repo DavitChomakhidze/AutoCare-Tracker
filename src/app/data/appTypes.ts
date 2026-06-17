@@ -35,6 +35,7 @@ export interface AppActions {
   register: (name: string, email: string, password: string) => Promise<boolean>;
   resetPassword: (email: string) => Promise<boolean>;
   uploadAvatar: (file: File) => Promise<string | null>;
+  uploadServiceReceipt: (file: File, serviceRecordId: string) => Promise<{ path: string; url: string | null; fileName: string } | null>;
   updateProfile: (profile: UserProfile) => Promise<boolean>;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
   logOutEverywhere: () => Promise<boolean>;
@@ -93,6 +94,9 @@ export interface ServiceRecord {
   status: 'completed' | 'scheduled';
   notes: string;
   createdAt?: string;
+  receiptPath?: string | null;
+  receiptUrl?: string | null;
+  receiptFileName?: string | null;
   parts: { name: string; brand: string; quantity: number; unitPrice: number }[];
 }
 

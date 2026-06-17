@@ -18,7 +18,7 @@ export const categoryColors: Record<ExpenseCategory, string> = {
 };
 
 export function formatCurrency(value: number) {
-  return `₾${Math.round(value).toLocaleString()}`;
+  return `GEL${Math.round(value).toLocaleString()}`;
 }
 
 export function getExpenseCategory(record: ServiceRecord): ExpenseCategory {
