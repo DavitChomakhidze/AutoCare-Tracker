@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AutoCare">
+  <defs>
+    <linearGradient id="autocare-gradient" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f6fb8" />
+      <stop offset="1" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#autocare-gradient)" />
+  <path
+    d="M17 41V24.5C17 22.6 18.6 21 20.5 21H43.5C45.4 21 47 22.6 47 24.5V41"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.95"
+  />
+  <path
+    d="M21 35H43M23 41H41"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="4"
+    stroke-linecap="round"
+    opacity="0.95"
+  />
+  <circle cx="23" cy="44" r="4" fill="#ffffff" />
+  <circle cx="41" cy="44" r="4" fill="#ffffff" />
+</svg>

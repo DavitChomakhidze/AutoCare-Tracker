@@ -1,7 +1,7 @@
 
-  # Start Design Implementation
+  # AutoCare
 
-  This is a code bundle for Start Design Implementation. The original project is available at https://www.figma.com/design/bBBWhQprdNeInj4vZE4I8f/Start-Design-Implementation.
+  AutoCare is a vehicle maintenance tracker for managing vehicles, service records, reminders, expenses, and maintenance history.
 
   ## Running the code
 
