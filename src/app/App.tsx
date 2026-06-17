@@ -18,6 +18,7 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { ConfirmEmail } from './pages/ConfirmEmail';
 import { ForgotPassword } from './pages/ForgotPassword';
+import { ResetPassword } from './pages/ResetPassword';
 import { Welcome } from './pages/Welcome';
 import { AddFirstVehicle } from './pages/AddFirstVehicle';
 import { Toast } from './components/Toast';
@@ -33,6 +34,7 @@ import {
   resetPassword,
   signOutEverywhere,
   updatePassword as updateAccountPassword,
+  updateRecoveredPassword,
   updateProfile as updateAccountProfile,
   uploadAvatar
 } from './services/authService';
@@ -60,7 +62,7 @@ import {
   upsertNotifications
 } from './services/notificationService';
 
-const publicPages: Page[] = ['landing', 'login', 'register', 'confirm-email', 'forgot-password'];
+const publicPages: Page[] = ['landing', 'login', 'register', 'confirm-email', 'forgot-password', 'reset-password'];
 const authRedirectPages: Page[] = ['landing', 'login', 'register', 'confirm-email', 'forgot-password'];
 
 const pagePaths: Record<Page, string> = {
@@ -69,6 +71,7 @@ const pagePaths: Record<Page, string> = {
   register: '/register',
   'confirm-email': '/confirm-email',
   'forgot-password': '/forgot-password',
+  'reset-password': '/reset-password',
   welcome: '/welcome',
   'add-first-vehicle': '/add-first-vehicle',
   dashboard: '/dashboard',
@@ -96,6 +99,11 @@ function pageFromPath(pathname: string): Page {
   }
 
   return pathPages[pathname] || 'landing';
+}
+
+function isPasswordRecoveryUrl() {
+  const params = `${window.location.search} ${window.location.hash}`;
+  return /type=recovery|PASSWORD_RECOVERY/i.test(params);
 }
 
 function isPublicPage(page: Page) {
@@ -265,6 +273,7 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [accountProfile, setAccountProfile] = useState<UserProfile | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [passwordRecovery, setPasswordRecovery] = useState(isPasswordRecoveryUrl());
   const [dataLoading, setDataLoading] = useState(false);
   const [toast, setToast] = useState<{ type: ToastType; message: string } | null>(null);
   const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
@@ -418,7 +427,12 @@ export default function App() {
       setAuthLoading(false);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecovery(true);
+        showPage('reset-password', true);
+      }
+
       if (sessionHasOversizedAuthHeader(nextSession)) {
         repairOversizedAuthMetadata()
           .then((repairedSession) => {
@@ -464,6 +478,10 @@ export default function App() {
       if (!isPublicPage(currentPage)) {
         showPage('login', true);
       }
+      return;
+    }
+
+    if (currentPage === 'reset-password') {
       return;
     }
 
@@ -541,6 +559,26 @@ export default function App() {
           return true;
         } catch (error) {
           setToast({ type: 'error', message: `Password reset failed: ${errorMessage(error)}` });
+          return false;
+        }
+      },
+      updateRecoveredPassword: async (newPassword) => {
+        try {
+          await updateRecoveredPassword(newPassword);
+          setPasswordRecovery(false);
+          setToast({ type: 'success', message: 'Password updated. Please log in with your new password.' });
+          await signOut();
+          setSession(null);
+          setVehicles([]);
+          setServiceRecords([]);
+          setReminders([]);
+          setStoredNotifications([]);
+          setAccountProfile(null);
+          setSelectedVehicleId('');
+          showPage('login', true);
+          return true;
+        } catch (error) {
+          setToast({ type: 'error', message: `Password could not be reset: ${errorMessage(error)}` });
           return false;
         }
       },
@@ -862,6 +900,7 @@ export default function App() {
     if (currentPage === 'register') page = <Register actions={actions} />;
     if (currentPage === 'confirm-email') page = <ConfirmEmail actions={actions} />;
     if (currentPage === 'forgot-password') page = <ForgotPassword actions={actions} />;
+    if (currentPage === 'reset-password') page = <ResetPassword actions={actions} canResetPassword={passwordRecovery && Boolean(session)} />;
     if (currentPage === 'landing') page = <LandingPage actions={actions} />;
 
     return (
@@ -995,6 +1034,12 @@ export default function App() {
   };
 
   return (
+    currentPage === 'reset-password' || passwordRecovery ? (
+      <>
+        <ResetPassword actions={actions} canResetPassword={passwordRecovery && Boolean(session)} />
+        {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
+      </>
+    ) : (
     <AppLayout
       title={config.title}
       breadcrumbs={config.breadcrumbs}
@@ -1015,5 +1060,6 @@ export default function App() {
       {renderPage()}
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
     </AppLayout>
+    )
   );
 }

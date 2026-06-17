@@ -6,6 +6,7 @@ export type Page =
   | 'register'
   | 'confirm-email'
   | 'forgot-password'
+  | 'reset-password'
   | 'welcome'
   | 'add-first-vehicle'
   | 'dashboard'
@@ -35,6 +36,7 @@ export interface AppActions {
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
   resetPassword: (email: string) => Promise<boolean>;
+  updateRecoveredPassword: (newPassword: string) => Promise<boolean>;
   uploadAvatar: (file: File) => Promise<string | null>;
   uploadServiceReceipt: (file: File, serviceRecordId: string) => Promise<{ path: string; url: string | null; fileName: string } | null>;
   updateProfile: (profile: UserProfile) => Promise<boolean>;
