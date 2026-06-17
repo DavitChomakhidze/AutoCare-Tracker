@@ -270,6 +270,18 @@
     border-radius: var(--radius-button);
   }
 
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  a[href],
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
   table {
     border-collapse: separate;
     border-spacing: 0;
