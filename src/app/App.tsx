@@ -50,6 +50,14 @@ import {
   getReminders,
   updateReminder
 } from './services/reminderService';
+import {
+  deleteNotification as deleteNotificationRequest,
+  getNotifications,
+  markAllNotificationsRead as markAllNotificationsReadRequest,
+  markNotificationRead as markNotificationReadRequest,
+  NotificationInput,
+  upsertNotifications
+} from './services/notificationService';
 
 const publicPages: Page[] = ['landing', 'login', 'register', 'forgot-password'];
 const authRedirectPages: Page[] = ['landing', 'login', 'register', 'forgot-password'];
@@ -188,6 +196,57 @@ function reminderNotificationTitle(reminder: Reminder) {
   return `${reminder.title} reminder`;
 }
 
+function notificationInputsFromData(serviceRecords: ServiceRecord[], reminders: Reminder[], vehicles: Vehicle[]): NotificationInput[] {
+  const serviceNotifications: NotificationInput[] = serviceRecords.map((record) => ({
+    type: 'service_record_added',
+    title: 'Service record added',
+    message: `${record.type} for ${record.vehicle}`,
+    sourceType: 'service_record',
+    sourceId: record.id,
+    createdAt: record.createdAt || record.date
+  }));
+
+  const reminderNotifications = reminders.flatMap((reminder): NotificationInput[] => {
+    const vehicle = vehicles.find((item) => item.id === reminder.vehicleId);
+    if (!vehicle) return [];
+
+    const status = reminder.isCompleted ? 'completed' : reminder.status;
+    const shouldNotify = status === 'completed' || status === 'overdue' || status === 'due-soon';
+    if (!shouldNotify) return [];
+
+    return [{
+      type: `reminder_${status.replace('-', '_')}`,
+      title: reminderNotificationTitle(reminder),
+      message: `${vehicleName(vehicle)} - ${vehicle.plate}`,
+      sourceType: 'reminder',
+      sourceId: reminder.id,
+      createdAt: reminder.completedAt || reminder.updatedAt || reminder.createdAt
+    }];
+  });
+
+  return [...serviceNotifications, ...reminderNotifications];
+}
+
+function notificationIcon(notification: AppNotification) {
+  if (notification.type === 'service_record_added') {
+    return <Wrench size={20} className="text-success-500" />;
+  }
+
+  if (notification.type === 'reminder_completed') {
+    return <CheckCircle size={20} className="text-success-500" />;
+  }
+
+  if (notification.type === 'reminder_overdue') {
+    return <AlertCircle size={20} className="text-danger-500" />;
+  }
+
+  if (notification.type === 'reminder_due_soon') {
+    return <AlertCircle size={20} />;
+  }
+
+  return <Bell size={20} />;
+}
+
 export default function App() {
   const initialPage = pageFromPath(window.location.pathname);
   const [currentPage, setCurrentPage] = useState<Page>(initialPage);
@@ -202,8 +261,7 @@ export default function App() {
   const [selectedVehicleId, setSelectedVehicleId] = useState(vehicleIdFromPath(window.location.pathname));
   const [serviceRecords, setServiceRecords] = useState<ServiceRecord[]>([]);
   const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [notificationReadIds, setNotificationReadIds] = useState(() => new Set<string>());
-  const [deletedNotificationIds, setDeletedNotificationIds] = useState(() => new Set<string>());
+  const [storedNotifications, setStoredNotifications] = useState<AppNotification[]>([]);
 
   const showPage = useCallback((page: Page, replace = false) => {
     setCurrentPage(page);
@@ -231,6 +289,8 @@ export default function App() {
       setVehicles(nextVehicles);
       setServiceRecords(nextServiceRecords);
       setReminders(nextReminders);
+      await upsertNotifications(userId, notificationInputsFromData(nextServiceRecords, nextReminders, nextVehicles));
+      setStoredNotifications(await getNotifications(userId));
       setSelectedVehicleId((currentSelectedId) => {
         if (currentSelectedId && nextVehicles.some((vehicle) => vehicle.id === currentSelectedId)) return currentSelectedId;
         return nextVehicles[0]?.id || '';
@@ -386,6 +446,7 @@ export default function App() {
       setVehicles([]);
       setServiceRecords([]);
       setReminders([]);
+      setStoredNotifications([]);
       setAccountProfile(null);
       setSelectedVehicleId('');
       if (!isPublicPage(currentPage)) {
@@ -517,6 +578,7 @@ export default function App() {
         setVehicles([]);
         setServiceRecords([]);
         setReminders([]);
+        setStoredNotifications([]);
         setSelectedVehicleId('');
         setAccountProfile(null);
         clearLocalSupabaseAuthTokens({ includeCurrentKey: true });
@@ -531,6 +593,7 @@ export default function App() {
           setVehicles([]);
           setServiceRecords([]);
           setReminders([]);
+          setStoredNotifications([]);
           setSelectedVehicleId('');
           setToast({ type: 'success', message: 'All stored vehicle data deleted.' });
           return true;
@@ -552,6 +615,7 @@ export default function App() {
         setVehicles([]);
         setServiceRecords([]);
         setReminders([]);
+        setStoredNotifications([]);
         setAccountProfile(null);
         setSelectedVehicleId('');
         clearLocalSupabaseAuthTokens({ includeCurrentKey: true });
@@ -623,6 +687,8 @@ export default function App() {
         try {
           const savedRecord = await createServiceRecord(record, session.user.id);
           setServiceRecords((currentRecords) => [savedRecord, ...currentRecords]);
+          await upsertNotifications(session.user.id, notificationInputsFromData([savedRecord], [], vehicles));
+          setStoredNotifications(await getNotifications(session.user.id));
           return true;
         } catch (error) {
           setToast({ type: 'error', message: `Service record could not be saved: ${errorMessage(error)}` });
@@ -658,6 +724,8 @@ export default function App() {
         try {
           const savedReminder = await createReminder({ ...reminder, isCompleted: false }, session.user.id);
           setReminders((currentReminders) => [savedReminder, ...currentReminders]);
+          await upsertNotifications(session.user.id, notificationInputsFromData([], [savedReminder], vehicles));
+          setStoredNotifications(await getNotifications(session.user.id));
           return true;
         } catch (error) {
           setToast({ type: 'error', message: `Reminder could not be saved: ${errorMessage(error)}` });
@@ -671,6 +739,8 @@ export default function App() {
           setReminders((currentReminders) =>
             currentReminders.map((currentReminder) => (currentReminder.id === savedReminder.id ? savedReminder : currentReminder))
           );
+          await upsertNotifications(session.user.id, notificationInputsFromData([], [savedReminder], vehicles));
+          setStoredNotifications(await getNotifications(session.user.id));
           return true;
         } catch (error) {
           setToast({ type: 'error', message: `Reminder could not be updated: ${errorMessage(error)}` });
@@ -695,6 +765,8 @@ export default function App() {
           setReminders((currentReminders) =>
             currentReminders.map((reminder) => (reminder.id === savedReminder.id ? savedReminder : reminder))
           );
+          await upsertNotifications(session.user.id, notificationInputsFromData([], [savedReminder], vehicles));
+          setStoredNotifications(await getNotifications(session.user.id));
           return true;
         } catch (error) {
           setToast({ type: 'error', message: `Reminder could not be completed: ${errorMessage(error)}` });
@@ -706,6 +778,8 @@ export default function App() {
         try {
           const savedRecord = await createServiceRecord(record, session.user.id);
           setServiceRecords((currentRecords) => [savedRecord, ...currentRecords]);
+          await upsertNotifications(session.user.id, notificationInputsFromData([savedRecord], [], vehicles));
+          setStoredNotifications(await getNotifications(session.user.id));
           return true;
         } catch (error) {
           setToast({ type: 'error', message: `Service record could not be saved: ${errorMessage(error)}` });
@@ -799,65 +873,41 @@ export default function App() {
   };
 
   const config = pageConfig[currentPage as keyof typeof pageConfig] || pageConfig.dashboard;
-  const generatedNotifications: AppNotification[] = (() => {
-    const reminderNotifications = reminders.flatMap((reminder) => {
-      const vehicle = vehicles.find((item) => item.id === reminder.vehicleId);
-      if (!vehicle) return [];
-
-      const status = reminder.status;
-      const shouldNotify = reminder.isCompleted || status === 'overdue' || status === 'due-soon';
-      if (!shouldNotify) return [];
-
-      return [{
-        id: `reminder-${reminder.id}-${reminder.isCompleted ? 'completed' : status || 'active'}`,
-        icon: reminder.isCompleted ? <CheckCircle size={20} className="text-success-500" /> : <AlertCircle size={20} className={status === 'overdue' ? 'text-danger-500' : ''} />,
-        title: reminderNotificationTitle(reminder),
-        description: `${vehicleName(vehicle)} - ${vehicle.plate}`,
-        time: relativeNotificationTime(reminder.completedAt || reminder.updatedAt || reminder.createdAt),
-        read: false,
-        category: 'Maintenance' as const
-      }];
-    });
-
-    const serviceNotifications = serviceRecords.slice(0, 3).map((record) => ({
-      id: `service-${record.id}`,
-      icon: <Wrench size={20} className="text-success-500" />,
-      title: 'Service record added',
-      description: `${record.type} for ${record.vehicle}`,
-      time: relativeNotificationTime(record.createdAt || record.date),
-      read: false,
-      category: 'System' as const
-    }));
-
-    if (vehicles.length === 0) {
-      return [];
+  const notifications = storedNotifications.map((notification) => ({
+    ...notification,
+    icon: notificationIcon(notification),
+    time: relativeNotificationTime(notification.createdAt)
+  }));
+  const unreadNotificationCount = notifications.filter((item) => !item.read).length;
+  const notificationReadIds = new Set(notifications.filter((item) => item.read).map((item) => item.id));
+  const markNotificationRead = async (notificationId: string) => {
+    if (!session) return;
+    try {
+      const savedNotification = await markNotificationReadRequest(notificationId, session.user.id);
+      setStoredNotifications((currentNotifications) =>
+        currentNotifications.map((notification) => (notification.id === savedNotification.id ? savedNotification : notification))
+      );
+    } catch (error) {
+      setToast({ type: 'error', message: `Notification could not be marked as read: ${errorMessage(error)}` });
     }
-
-    if (reminderNotifications.length === 0 && serviceNotifications.length === 0) {
-      return [{
-        id: 'system-all-caught-up',
-        icon: <Bell size={20} />,
-        title: 'All caught up',
-        description: 'No overdue or due-soon maintenance reminders right now.',
-        time: 'Just now',
-        read: true,
-        category: 'System' as const
-      }];
+  };
+  const markAllNotificationsRead = async () => {
+    if (!session) return;
+    try {
+      await markAllNotificationsReadRequest(session.user.id);
+      setStoredNotifications(await getNotifications(session.user.id));
+    } catch (error) {
+      setToast({ type: 'error', message: `Notifications could not be marked as read: ${errorMessage(error)}` });
     }
-
-    return [...reminderNotifications, ...serviceNotifications];
-  })();
-
-  const notifications = generatedNotifications.filter((item) => !deletedNotificationIds.has(item.id));
-  const unreadNotificationCount = notifications.filter((item) => !item.read && !notificationReadIds.has(item.id)).length;
-  const markNotificationRead = (notificationId: string) => {
-    setNotificationReadIds((currentIds) => new Set(currentIds).add(notificationId));
   };
-  const markAllNotificationsRead = () => {
-    setNotificationReadIds(new Set(generatedNotifications.map((item) => item.id)));
-  };
-  const deleteNotification = (notificationId: string) => {
-    setDeletedNotificationIds((currentIds) => new Set(currentIds).add(notificationId));
+  const deleteNotification = async (notificationId: string) => {
+    if (!session) return;
+    try {
+      await deleteNotificationRequest(notificationId, session.user.id);
+      setStoredNotifications((currentNotifications) => currentNotifications.filter((notification) => notification.id !== notificationId));
+    } catch (error) {
+      setToast({ type: 'error', message: `Notification could not be deleted: ${errorMessage(error)}` });
+    }
   };
 
   const renderPage = () => {

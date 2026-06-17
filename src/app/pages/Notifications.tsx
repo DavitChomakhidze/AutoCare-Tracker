@@ -17,9 +17,9 @@ export function Notifications({
   actions: AppActions;
   notifications: AppNotification[];
   readIds: Set<string>;
-  onMarkRead: (notificationId: string) => void;
-  onMarkAllRead: () => void;
-  onDelete: (notificationId: string) => void;
+  onMarkRead: (notificationId: string) => void | Promise<void>;
+  onMarkAllRead: () => void | Promise<void>;
+  onDelete: (notificationId: string) => void | Promise<void>;
 }) {
   const [activeTab, setActiveTab] = useState<NotificationTab>('All');
 
@@ -51,8 +51,8 @@ export function Notifications({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              onMarkAllRead();
+            onClick={async () => {
+              await onMarkAllRead();
               actions.toast('success', 'All notifications marked as read.');
             }}
           >
@@ -104,8 +104,8 @@ export function Notifications({
                       {!isRead && <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />}
                       <button
                         className="text-muted-foreground hover:text-destructive"
-                        onClick={() => {
-                          onDelete(notification.id);
+                        onClick={async () => {
+                          await onDelete(notification.id);
                           actions.toast('success', 'Notification deleted.');
                         }}
                       >

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Car, Plus, Search, FileText } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -37,6 +37,8 @@ const sortOptions = [
   { value: 'mileage-desc', label: 'Mileage: High to Low' },
   { value: 'mileage-asc', label: 'Mileage: Low to High' }
 ];
+
+const recordsPerPage = 10;
 
 function recordCreatedTime(record: ServiceRecord) {
   return new Date(record.createdAt || record.date).getTime() || 0;
@@ -91,6 +93,7 @@ export function ServiceHistory({
   const [serviceTypeFilter, setServiceTypeFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
   const knownVehicleIds = new Set(vehicles.map((vehicle) => vehicle.id));
@@ -138,8 +141,23 @@ export function ServiceHistory({
       if (sortBy === 'mileage-asc') return firstRecord.mileage - secondRecord.mileage;
       return recordCreatedTime(secondRecord) - recordCreatedTime(firstRecord);
     });
+  const totalPages = Math.max(1, Math.ceil(filteredRecords.length / recordsPerPage));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const pageStartIndex = (safeCurrentPage - 1) * recordsPerPage;
+  const pageEndIndex = Math.min(pageStartIndex + recordsPerPage, filteredRecords.length);
+  const paginatedRecords = filteredRecords.slice(pageStartIndex, pageEndIndex);
+  const paginationSummary =
+    filteredRecords.length === 0
+      ? 'Showing 0 of 0 records'
+      : filteredRecords.length <= recordsPerPage
+        ? `Showing ${filteredRecords.length} of ${filteredRecords.length} records`
+        : `Showing ${pageStartIndex + 1}-${pageEndIndex} of ${filteredRecords.length} records`;
   const selectedRecord = visibleSourceRecords.find((record) => record.id === selectedRecordId);
   const hasVehicles = vehicles.length > 0;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, vehicleFilter, serviceTypeFilter, dateFilter, sortBy]);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -206,7 +224,17 @@ export function ServiceHistory({
           </div>
         ) : (
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[980px] table-fixed">
+            <colgroup>
+              <col className="w-[12%]" />
+              <col className="w-[18%]" />
+              <col className="w-[16%]" />
+              <col className="w-[13%]" />
+              <col className="w-[16%]" />
+              <col className="w-[10%]" />
+              <col className="w-[10%]" />
+              <col className="w-[180px]" />
+            </colgroup>
             <thead>
               <tr className="border-b border-border bg-neutral-50">
                 <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
@@ -220,21 +248,21 @@ export function ServiceHistory({
               </tr>
             </thead>
             <tbody>
-              {filteredRecords.map((record) => (
+              {paginatedRecords.map((record) => (
                 <tr key={record.id} className="border-b border-border hover:bg-accent/50">
-                  <td className="py-4 px-4">
+                  <td className="py-4 px-4 whitespace-nowrap">
                     <span className="font-medium">{record.date}</span>
                   </td>
                   <td className="py-4 px-4">
-                    <div>
-                      <p className="font-medium">{record.vehicle}</p>
-                      <p className="text-sm text-muted-foreground">{record.plate}</p>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{record.vehicle}</p>
+                      <p className="text-sm text-muted-foreground truncate">{record.plate}</p>
                     </div>
                   </td>
-                  <td className="py-4 px-4">{record.type}</td>
-                  <td className="py-4 px-4">{record.mileage.toLocaleString()} km</td>
-                  <td className="py-4 px-4">{record.workshop}</td>
-                  <td className="py-4 px-4 font-semibold">{money(record.cost)}</td>
+                  <td className="py-4 px-4 truncate">{record.type}</td>
+                  <td className="py-4 px-4 whitespace-nowrap">{record.mileage.toLocaleString()} km</td>
+                  <td className="py-4 px-4 truncate">{record.workshop}</td>
+                  <td className="py-4 px-4 font-semibold whitespace-nowrap">{money(record.cost)}</td>
                   <td className="py-4 px-4">
                     <Badge variant={record.status}>
                       {record.status === 'completed' ? 'Completed' : 'Scheduled'}
@@ -254,11 +282,27 @@ export function ServiceHistory({
         </div>
         )}
 
-        <div className="p-4 border-t border-border flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">Showing {filteredRecords.length} of {visibleSourceRecords.length} records</p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled>Previous</Button>
-            <Button variant="outline" size="sm" disabled>Next</Button>
+        <div className="p-4 border-t border-border flex items-center gap-4">
+          <p className="min-w-0 flex-1 text-sm text-muted-foreground">{paginationSummary}</p>
+          <div className="flex w-[180px] flex-none justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-[84px]"
+              disabled={safeCurrentPage <= 1}
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-[72px]"
+              disabled={safeCurrentPage >= totalPages || filteredRecords.length <= recordsPerPage}
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            >
+              Next
+            </Button>
           </div>
         </div>
       </Card>

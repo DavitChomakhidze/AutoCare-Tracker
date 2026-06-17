@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Search, Bell, Menu } from 'lucide-react';
 import { AppNotification, UserProfile } from '../data/appTypes';
 import { ProfileAvatar } from './ProfileAvatar';
@@ -15,8 +15,8 @@ interface TopBarProps {
   notifications: AppNotification[];
   notificationReadIds: Set<string>;
   notificationCount?: number;
-  onMarkNotificationRead: (notificationId: string) => void;
-  onMarkAllNotificationsRead: () => void;
+  onMarkNotificationRead: (notificationId: string) => void | Promise<void>;
+  onMarkAllNotificationsRead: () => void | Promise<void>;
 }
 
 export function TopBar({
@@ -35,7 +35,32 @@ export function TopBar({
   onMarkAllNotificationsRead
 }: TopBarProps) {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const notificationDropdownRef = useRef<HTMLDivElement>(null);
   const previewNotifications = notifications.slice(0, 5);
+
+  useEffect(() => {
+    if (!showNotificationDropdown) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!notificationDropdownRef.current?.contains(event.target as Node)) {
+        setShowNotificationDropdown(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowNotificationDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showNotificationDropdown]);
 
   return (
     <header className="relative z-[200] h-16 bg-card/90 backdrop-blur border-b border-border/80 px-6 flex items-center justify-between shadow-sm">
@@ -78,9 +103,13 @@ export function TopBar({
         </button>
 
         {showNotifications && (
-          <div className="relative">
+          <div ref={notificationDropdownRef} className="relative">
             <button
+              type="button"
               onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
+              aria-label="Notifications"
+              aria-expanded={showNotificationDropdown}
+              aria-controls="notification-preview-menu"
               className="relative w-9 h-9 rounded-lg bg-warning-50 text-warning-700 hover:bg-warning-100 transition-colors flex items-center justify-center"
             >
               <Bell size={20} />
@@ -92,7 +121,7 @@ export function TopBar({
             </button>
 
             {showNotificationDropdown && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-popover/95 backdrop-blur border border-border rounded-lg shadow-lg z-[1000] overflow-hidden">
+              <div id="notification-preview-menu" className="absolute right-0 top-full mt-2 w-80 bg-popover/95 backdrop-blur border border-border rounded-lg shadow-lg z-[1000] overflow-hidden">
                 <div className="p-4 border-b border-border">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">Notifications</h3>

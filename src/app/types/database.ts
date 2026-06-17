@@ -122,6 +122,33 @@ export interface Database {
         };
         Update: Partial<Database['public']['Tables']['service_records']['Insert']>;
       };
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: string;
+          title: string;
+          message: string;
+          source_type: string | null;
+          source_id: string | null;
+          read_at: string | null;
+          deleted_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: string;
+          title: string;
+          message: string;
+          source_type?: string | null;
+          source_id?: string | null;
+          read_at?: string | null;
+          deleted_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['notifications']['Insert']>;
+      };
       reminders: {
         Row: {
           id: string;

@@ -19,8 +19,8 @@ interface AppLayoutProps {
   notifications: AppNotification[];
   notificationReadIds: Set<string>;
   notificationCount: number;
-  onMarkNotificationRead: (notificationId: string) => void;
-  onMarkAllNotificationsRead: () => void;
+  onMarkNotificationRead: (notificationId: string) => void | Promise<void>;
+  onMarkAllNotificationsRead: () => void | Promise<void>;
   onNavigate: (id: string) => void;
   onLogout?: () => void;
 }

@@ -123,12 +123,16 @@ export interface Reminder {
 
 export interface AppNotification {
   id: string;
-  icon: ReactNode;
+  icon?: ReactNode;
+  type: string;
   title: string;
   description: string;
   time: string;
   read: boolean;
+  createdAt: string;
   category: 'Maintenance' | 'System';
+  sourceType?: string | null;
+  sourceId?: string | null;
 }
 
 export function money(value: number) {

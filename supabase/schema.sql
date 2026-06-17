@@ -106,6 +106,22 @@ create table if not exists public.reminders (
 alter table public.reminders add column if not exists reminder_email_sent_at timestamptz;
 alter table public.reminders add column if not exists reminder_email_last_status text;
 
+create table if not exists public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  type text not null,
+  title text not null,
+  message text not null,
+  source_type text,
+  source_id uuid,
+  read_at timestamptz,
+  deleted_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists notifications_source_unique_idx
+  on public.notifications (user_id, source_type, source_id, type);
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -149,6 +165,7 @@ alter table public.profiles enable row level security;
 alter table public.vehicles enable row level security;
 alter table public.service_records enable row level security;
 alter table public.reminders enable row level security;
+alter table public.notifications enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own" on public.profiles for select to authenticated using ((select auth.uid()) = id);
@@ -222,6 +239,15 @@ create policy "reminders_update_own" on public.reminders for update to authentic
 drop policy if exists "reminders_delete_own" on public.reminders;
 create policy "reminders_delete_own" on public.reminders for delete to authenticated using ((select auth.uid()) = user_id);
 
+drop policy if exists "notifications_select_own" on public.notifications;
+create policy "notifications_select_own" on public.notifications for select to authenticated using ((select auth.uid()) = user_id);
+drop policy if exists "notifications_insert_own" on public.notifications;
+create policy "notifications_insert_own" on public.notifications for insert to authenticated with check ((select auth.uid()) = user_id);
+drop policy if exists "notifications_update_own" on public.notifications;
+create policy "notifications_update_own" on public.notifications for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+drop policy if exists "notifications_delete_own" on public.notifications;
+create policy "notifications_delete_own" on public.notifications for delete to authenticated using ((select auth.uid()) = user_id);
+
 create index if not exists vehicles_user_id_idx on public.vehicles using btree (user_id);
 create index if not exists vehicles_created_at_idx on public.vehicles using btree (created_at);
 create index if not exists service_records_user_id_idx on public.service_records using btree (user_id);
@@ -232,3 +258,5 @@ create index if not exists reminders_vehicle_id_idx on public.reminders using bt
 create index if not exists reminders_due_date_idx on public.reminders using btree (due_date);
 create index if not exists reminders_due_mileage_idx on public.reminders using btree (due_mileage);
 create index if not exists reminders_email_due_idx on public.reminders using btree (is_completed, reminder_email_sent_at, due_date);
+create index if not exists notifications_user_created_idx on public.notifications using btree (user_id, created_at desc);
+create index if not exists notifications_user_unread_idx on public.notifications using btree (user_id, read_at, deleted_at);
