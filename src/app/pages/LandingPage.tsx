@@ -9,7 +9,6 @@ import {
   HelpCircle,
   Users,
   BookOpen,
-  Mail,
   Lock,
   FileText,
   Menu,
@@ -18,6 +17,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { Modal } from '../components/Modal';
 import { AppActions } from '../data/appTypes';
 
 const features = [
@@ -76,8 +76,8 @@ const faqs = [
     answer: 'Yes. The Starter plan is enough to manage one vehicle, record services, and create basic reminders.'
   },
   {
-    question: 'Does the prototype connect to a real mechanic or vehicle API?',
-    answer: 'No. This bachelor-project prototype focuses on personal vehicle records, reminders, expenses, and analytics.'
+    question: 'Does AutoCare connect to a mechanic or vehicle API?',
+    answer: 'AutoCare focuses on personal vehicle records, reminders, expenses, and analytics. It does not provide mechanic booking, telematics, or automatic vehicle diagnostics.'
   },
   {
     question: 'Can reminders be based on mileage?',
@@ -93,28 +93,41 @@ const blogPosts = [
   {
     title: 'How to build a simple car maintenance routine',
     category: 'Maintenance',
-    description: 'A practical checklist for oil changes, inspections, tires, brakes, and seasonal care.'
+    description: 'A practical checklist for oil changes, inspections, tires, brakes, and seasonal care.',
+    content: [
+      'A useful maintenance routine starts with a few recurring checks. Review engine oil, coolant, tire pressure, lights, and windshield fluid at least once a month. These small habits help you catch issues before they become expensive repairs.',
+      'For scheduled maintenance, keep a clear record of oil changes, brake inspections, tire rotations, filter replacements, and yearly inspections. AutoCare helps organize these records by vehicle so you can see what was done, when it happened, and what should come next.',
+      'Seasonal checks are also important. Before winter, inspect tires, battery health, wipers, and antifreeze. Before summer, check cooling performance, air conditioning, and tire condition. A simple routine is easier to follow when reminders and history are stored in one place.'
+    ]
   },
   {
     title: 'Why mileage-based reminders matter',
     category: 'Reminders',
-    description: 'Learn when date reminders are enough and when odometer-based tracking gives better results.'
+    description: 'Learn when date reminders are enough and when odometer-based tracking gives better results.',
+    content: [
+      'Some maintenance tasks depend more on distance than calendar time. Oil changes, tire rotations, brake checks, spark plugs, and timing-related services are often recommended after a certain number of kilometers.',
+      'Date-based reminders are still useful for inspections, insurance, seasonal checks, and items that age over time. Mileage-based reminders are better when driving habits vary. A driver who travels every day may reach the next service interval much faster than someone who drives only on weekends.',
+      'Using both date and mileage reminders gives a more realistic maintenance schedule. AutoCare lets you track current mileage and plan upcoming work before a service interval is missed.'
+    ]
   },
   {
     title: 'Tracking vehicle costs without overcomplicating it',
     category: 'Expenses',
-    description: 'Simple ways to understand monthly car spending and prepare for bigger repairs.'
+    description: 'Simple ways to understand monthly car spending and prepare for bigger repairs.',
+    content: [
+      'Vehicle expenses are easier to understand when every service record includes a clear cost. Splitting costs into labor, parts, and additional fees helps show where money is going over time.',
+      'A monthly view can reveal patterns: frequent small repairs, seasonal maintenance spikes, or one vehicle costing more than expected. This makes budgeting more practical and helps owners prepare for future work.',
+      'AutoCare keeps expense tracking connected to real service history, so reports are based on maintenance records instead of separate notes or spreadsheets.'
+    ]
   }
 ];
 
-const contactItems = [
-  { label: 'Email', value: 'support@autocaretracker.local' },
-  { label: 'Project owner', value: 'David Chomakhidze' },
-  { label: 'Response time', value: '1-2 business days' }
-];
+type BlogPost = (typeof blogPosts)[number];
 
 export function LandingPage({ actions }: { actions: AppActions }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedBlogPost, setSelectedBlogPost] = useState<BlogPost | null>(null);
+  const [showBlogList, setShowBlogList] = useState(false);
 
   useEffect(() => {
     if (!mobileMenuOpen) return;
@@ -256,8 +269,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
               ['pricing', 'Pricing'],
               ['faq', 'FAQ'],
               ['how-it-works', 'How it works'],
-              ['about', 'About'],
-              ['contact', 'Contact']
+              ['about', 'About']
             ].map(([id, label]) => (
               <button
                 key={id}
@@ -505,7 +517,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
                 <ShieldCheck size={20} />
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Built for a university prototype</h3>
+                <h3 className="font-semibold mb-1">Built for focused maintenance tracking</h3>
                 <p className="text-sm text-muted-foreground">
                   The product scope stays focused on personal maintenance records, reminders, and expense tracking.
                 </p>
@@ -527,7 +539,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">About AutoCare Tracker</h2>
               <p className="text-lg text-muted-foreground mb-6">
-                AutoCare Tracker is a bachelor-project web application designed for everyday car owners who want a simple, reliable way to organize vehicle maintenance.
+                AutoCare Tracker is a vehicle maintenance web application designed for everyday car owners who want a simple, reliable way to organize vehicle maintenance.
               </p>
               <p className="text-muted-foreground">
                 The product focuses on the essentials: vehicles, service history, replaced parts, reminders, expenses, and clear analytics. It avoids complex fleet-management features so the experience stays practical and easy to use.
@@ -560,7 +572,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
                 Educational articles that support the product’s maintenance and repair tracking goals.
               </p>
             </div>
-            <Button variant="outline" onClick={() => actions.toast('info', 'Blog archive is a prototype preview.')}>
+            <Button variant="outline" onClick={() => setShowBlogList(true)}>
               View all posts
             </Button>
           </div>
@@ -575,7 +587,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
                 <p className="text-sm text-muted-foreground mb-5">{post.description}</p>
                 <button
                   className="text-sm font-medium text-primary hover:underline"
-                  onClick={() => actions.toast('info', 'Article opened in prototype mode.')}
+                  onClick={() => setSelectedBlogPost(post)}
                 >
                   Read article
                 </button>
@@ -585,45 +597,54 @@ export function LandingPage({ actions }: { actions: AppActions }) {
         </div>
       </section>
 
-      <section id="contact" className="py-20 bg-card/60">
-        <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <div className="w-14 h-14 mx-auto mb-4 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
-              <Mail size={28} />
+      <Modal
+        isOpen={Boolean(selectedBlogPost)}
+        onClose={() => setSelectedBlogPost(null)}
+        title={selectedBlogPost?.title}
+        size="lg"
+        footer={<Button variant="outline" onClick={() => setSelectedBlogPost(null)}>Close</Button>}
+      >
+        {selectedBlogPost && (
+          <article className="space-y-5">
+            <span className="inline-flex text-xs font-medium px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-600">
+              {selectedBlogPost.category}
+            </span>
+            <div className="space-y-4 text-sm text-muted-foreground leading-6">
+              {selectedBlogPost.content.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Contact</h2>
-            <p className="text-lg text-muted-foreground">
-              Send questions, feedback, or project review notes.
-            </p>
-          </div>
+          </article>
+        )}
+      </Modal>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card padding="lg">
-              <h3 className="text-xl font-semibold mb-4">Contact details</h3>
-              <div className="space-y-4">
-                {contactItems.map((item) => (
-                  <div key={item.label} className="flex justify-between gap-4 border-b border-border pb-3 last:border-b-0 last:pb-0">
-                    <span className="text-muted-foreground">{item.label}</span>
-                    <span className="font-medium text-right">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            <Card padding="lg">
-              <h3 className="text-xl font-semibold mb-4">Message form</h3>
-              <div className="space-y-4">
-                <input className="w-full h-10 px-3 rounded-input border border-input bg-input-background" placeholder="Your name" />
-                <input className="w-full h-10 px-3 rounded-input border border-input bg-input-background" placeholder="Email address" />
-                <textarea className="w-full min-h-28 px-3 py-2 rounded-input border border-input bg-input-background resize-none" placeholder="Message" />
-                <Button className="w-full" onClick={() => actions.toast('success', 'Message sent in prototype mode.')}>
-                  Send message
-                </Button>
-              </div>
-            </Card>
-          </div>
+      <Modal
+        isOpen={showBlogList}
+        onClose={() => setShowBlogList(false)}
+        title="All blog posts"
+        size="lg"
+        footer={<Button variant="outline" onClick={() => setShowBlogList(false)}>Close</Button>}
+      >
+        <div className="space-y-4">
+          {blogPosts.map((post) => (
+            <button
+              key={post.title}
+              type="button"
+              className="w-full rounded-lg border border-border p-4 text-left transition-colors hover:bg-accent"
+              onClick={() => {
+                setShowBlogList(false);
+                setSelectedBlogPost(post);
+              }}
+            >
+              <span className="inline-flex mb-2 text-xs font-medium px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-600">
+                {post.category}
+              </span>
+              <h3 className="font-semibold mb-1">{post.title}</h3>
+              <p className="text-sm text-muted-foreground">{post.description}</p>
+            </button>
+          ))}
         </div>
-      </section>
+      </Modal>
 
       <section id="privacy" className="py-20">
         <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8">
@@ -643,7 +664,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
               <p><strong className="text-foreground">Authentication:</strong> AutoCare uses Supabase Auth for account registration, login, password reset, and session management.</p>
               <p><strong className="text-foreground">Stored data:</strong> user profile, vehicle, service record, reminder, and avatar data are stored in Supabase.</p>
               <p><strong className="text-foreground">Purpose:</strong> this data powers dashboards, reminders, analytics, profile settings, and exportable maintenance reports.</p>
-              <p><strong className="text-foreground">Demo content:</strong> some marketing sections, blog previews, pricing examples, and contact messages use static sample content for presentation.</p>
+              <p><strong className="text-foreground">Static content:</strong> some public informational sections, blog articles, and pricing examples may use static content.</p>
             </div>
           </Card>
         </div>
@@ -658,7 +679,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-3">Terms of Service</h2>
               <p className="text-muted-foreground">
-                Short project terms for using AutoCare Tracker as a personal maintenance management tool.
+                Terms for using AutoCare Tracker as a personal maintenance management tool.
               </p>
             </div>
           </div>
@@ -666,7 +687,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
             <div className="space-y-5 text-sm text-muted-foreground leading-6">
               <p><strong className="text-foreground">Use of service:</strong> AutoCare Tracker is intended to help organize maintenance information and should not replace professional mechanical advice.</p>
               <p><strong className="text-foreground">Accuracy:</strong> users are responsible for entering correct mileage, dates, costs, and vehicle details.</p>
-              <p><strong className="text-foreground">Storage:</strong> authenticated app data is saved through Supabase, while some public landing-page sections are static demo content.</p>
+              <p><strong className="text-foreground">Storage:</strong> authenticated app data is saved through Supabase, while some public informational sections may use static content.</p>
               <p><strong className="text-foreground">Limitations:</strong> the product does not provide GPS tracking, telematics, AI diagnosis, online payments, or mechanic booking.</p>
             </div>
           </Card>
@@ -717,7 +738,6 @@ export function LandingPage({ actions }: { actions: AppActions }) {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#about" className="hover:text-foreground transition-colors">About</a></li>
                 <li><a href="#blog" className="hover:text-foreground transition-colors">Blog</a></li>
-                <li><a href="#contact" className="hover:text-foreground transition-colors">Contact</a></li>
               </ul>
             </div>
 

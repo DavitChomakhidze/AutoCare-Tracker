@@ -190,11 +190,11 @@ export function Register({ actions }: { actions: AppActions }) {
             <div className="w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
               <FileText size={20} />
             </div>
-            <p className="font-medium">Short project terms for using AutoCare Tracker as a personal maintenance management tool.</p>
+            <p className="font-medium">Terms for using AutoCare Tracker as a personal maintenance management tool.</p>
           </div>
           <p><strong className="text-foreground">Use of service:</strong> AutoCare Tracker is intended to help organize maintenance information and should not replace professional mechanical advice.</p>
           <p><strong className="text-foreground">Accuracy:</strong> users are responsible for entering correct mileage, dates, costs, and vehicle details.</p>
-          <p><strong className="text-foreground">Storage:</strong> authenticated app data is saved through Supabase, while some public landing-page sections are static demo content.</p>
+          <p><strong className="text-foreground">Storage:</strong> authenticated app data is saved through Supabase, while some public informational sections may use static content.</p>
           <p><strong className="text-foreground">Limitations:</strong> the product does not provide GPS tracking, telematics, AI diagnosis, online payments, or mechanic booking.</p>
         </div>
       </Modal>
