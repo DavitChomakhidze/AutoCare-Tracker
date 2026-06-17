@@ -16,6 +16,7 @@ import { MonthlyExpenses } from './pages/MonthlyExpenses';
 import { LandingPage } from './pages/LandingPage';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { ConfirmEmail } from './pages/ConfirmEmail';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { Welcome } from './pages/Welcome';
 import { AddFirstVehicle } from './pages/AddFirstVehicle';
@@ -59,13 +60,14 @@ import {
   upsertNotifications
 } from './services/notificationService';
 
-const publicPages: Page[] = ['landing', 'login', 'register', 'forgot-password'];
-const authRedirectPages: Page[] = ['landing', 'login', 'register', 'forgot-password'];
+const publicPages: Page[] = ['landing', 'login', 'register', 'confirm-email', 'forgot-password'];
+const authRedirectPages: Page[] = ['landing', 'login', 'register', 'confirm-email', 'forgot-password'];
 
 const pagePaths: Record<Page, string> = {
   landing: '/',
   login: '/login',
   register: '/register',
+  'confirm-email': '/confirm-email',
   'forgot-password': '/forgot-password',
   welcome: '/welcome',
   'add-first-vehicle': '/add-first-vehicle',
@@ -119,6 +121,11 @@ function errorMessage(error: unknown) {
 function isAuthRateLimitError(error: unknown) {
   if (!(error instanceof Error)) return false;
   return /rate limit|too many|429/i.test(error.message);
+}
+
+function isEmailNotConfirmedError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  return /email not confirmed|confirm.*email|not confirmed/i.test(error.message);
 }
 
 function isNetworkError(error: unknown) {
@@ -499,7 +506,9 @@ export default function App() {
             type: 'error',
             message: isAuthRateLimitError(error)
               ? 'Too many login attempts. Please wait a moment and try again.'
-              : 'Invalid email or password.'
+              : isEmailNotConfirmedError(error)
+                ? 'Please confirm your email before logging in.'
+                : 'Invalid email or password.'
           });
           return false;
         }
@@ -512,10 +521,12 @@ export default function App() {
             setAccountProfile({ name, email, avatarUrl: null });
             await loadUserData(data.session.user.id);
           }
-          showPage(data.session ? 'welcome' : 'login');
+          showPage(data.session ? 'welcome' : 'confirm-email');
           setToast({
             type: 'success',
-            message: data.session ? 'Account created. Welcome to AutoCare Tracker.' : 'Account created. Check your email to confirm it, then log in.'
+            message: data.session
+              ? 'Account created. Welcome to AutoCare Tracker.'
+              : 'Account created. Please check your email and confirm your account before logging in.'
           });
           return true;
         } catch (error) {
@@ -849,6 +860,7 @@ export default function App() {
   if (!session) {
     let page = <Login actions={actions} />;
     if (currentPage === 'register') page = <Register actions={actions} />;
+    if (currentPage === 'confirm-email') page = <ConfirmEmail actions={actions} />;
     if (currentPage === 'forgot-password') page = <ForgotPassword actions={actions} />;
     if (currentPage === 'landing') page = <LandingPage actions={actions} />;
 

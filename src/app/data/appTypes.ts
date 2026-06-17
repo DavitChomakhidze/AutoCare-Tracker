@@ -4,6 +4,7 @@ export type Page =
   | 'landing'
   | 'login'
   | 'register'
+  | 'confirm-email'
   | 'forgot-password'
   | 'welcome'
   | 'add-first-vehicle'
