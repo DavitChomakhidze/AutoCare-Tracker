@@ -157,7 +157,7 @@ export function Register({ actions }: { actions: AppActions }) {
               type="submit"
               className="w-full"
               loading={loading}
-              disabled={!passwordsMatch || !passwordValid}
+              disabled={!agreed || !passwordsMatch || !passwordValid}
             >
               Create account
             </Button>
