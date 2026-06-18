@@ -7,6 +7,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { AppActions, Reminder, ServiceRecord, UserProfile, Vehicle, vehicleName } from '../data/appTypes';
 import { getOverdueReminders, getReminderViews, getUpcomingReminders, sortByUrgency } from '../utils/reminders';
 import { formatCurrency } from '../utils/expenses';
+import { VehiclePhoto } from '../components/VehiclePhoto';
 
 function validPositiveCost(record: ServiceRecord) {
   return Number.isFinite(record.cost) && record.cost > 0;
@@ -228,9 +229,7 @@ export function Dashboard({
         </div>
 
         <div className="flex flex-col gap-6 md:flex-row">
-          <div className="w-full md:w-48 h-32 bg-neutral-100 rounded-lg flex items-center justify-center text-neutral-400">
-            <Car size={64} />
-          </div>
+          <VehiclePhoto vehicle={overviewVehicle} className="h-32 w-full rounded-lg md:w-48" iconSize={64} />
 
           <div className="flex-1">
             <div className="flex items-start justify-between mb-4">
