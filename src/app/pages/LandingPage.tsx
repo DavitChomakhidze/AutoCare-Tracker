@@ -176,7 +176,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
             <button
               type="button"
               aria-label="Go to AutoCare home"
-              className="flex items-center gap-3 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="flex items-center gap-3 rounded-lg text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               onClick={scrollToTop}
             >
               <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-success-500 rounded-lg flex items-center justify-center text-primary-foreground font-bold shadow-md shadow-primary-600/20">
@@ -245,7 +245,7 @@ export function LandingPage({ actions }: { actions: AppActions }) {
             <button
               type="button"
               aria-label="Go to AutoCare home"
-              className="flex items-center gap-3 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="flex items-center gap-3 rounded-lg text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               onClick={scrollToTop}
             >
               <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-success-500 rounded-lg flex items-center justify-center text-primary-foreground font-bold shadow-md shadow-primary-600/20">
