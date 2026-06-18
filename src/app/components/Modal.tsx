@@ -1,6 +1,8 @@
 import { ReactNode, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Button } from './Button';
+import { acquireOverlayBlur } from '../utils/overlayBlur';
 
 interface ModalProps {
   isOpen: boolean;
@@ -33,6 +35,13 @@ export function Modal({
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
+      const releaseOverlayBlur = acquireOverlayBlur();
+
+      return () => {
+        document.body.style.overflow = 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+        releaseOverlayBlur();
+      };
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -43,7 +52,7 @@ export function Modal({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === 'undefined') return null;
 
   const sizeStyles = {
     sm: 'max-w-md',
@@ -52,10 +61,10 @@ export function Modal({
     xl: 'max-w-4xl'
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/55"
+        className="absolute inset-0 bg-black/45"
         onClick={onClose}
       />
 
@@ -82,7 +91,8 @@ export function Modal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

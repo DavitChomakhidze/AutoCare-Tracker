@@ -202,6 +202,12 @@
     min-height: 100vh;
   }
 
+  body.app-overlay-open #root {
+    filter: blur(2px);
+    transform: scale(1.006);
+    transform-origin: center;
+  }
+
   ::selection {
     background: rgba(22, 135, 217, 0.22);
   }

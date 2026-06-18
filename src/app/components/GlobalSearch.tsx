@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Bell, Car, FileText, Search, Settings, Wrench, X } from 'lucide-react';
 import { Page, Reminder, ServiceRecord, Vehicle, vehicleName } from '../data/appTypes';
+import { acquireOverlayBlur } from '../utils/overlayBlur';
 
 interface GlobalSearchProps {
   isOpen: boolean;
@@ -64,7 +66,12 @@ export function GlobalSearch({
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    const releaseOverlayBlur = acquireOverlayBlur();
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      releaseOverlayBlur();
+    };
   }, [isOpen, onClose]);
 
   const results = useMemo<SearchResult[]>(() => {
@@ -116,15 +123,16 @@ export function GlobalSearch({
       .slice(0, 12);
   }, [normalizedQuery, reminders, serviceRecords, vehicles]);
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === 'undefined') return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-[1200] flex items-start justify-center bg-black/40 px-4 pt-20 backdrop-blur-sm"
+      className="fixed inset-0 z-[1200] flex items-start justify-center px-4 pt-20"
       onClick={onClose}
     >
+      <div className="absolute inset-0 bg-black/45" />
       <div
-        className="w-full max-w-2xl rounded-[var(--radius-card)] border border-border bg-card shadow-2xl overflow-hidden"
+        className="relative w-full max-w-2xl rounded-[var(--radius-card)] border border-border bg-card shadow-2xl overflow-hidden"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
@@ -174,6 +182,7 @@ export function GlobalSearch({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
