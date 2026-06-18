@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Car, Plus, Search, MoreVertical, Calendar, Gauge, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Search, MoreVertical, Calendar, Gauge, Edit2, Trash2 } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { Input } from '../components/Input';
 import { Modal, ConfirmModal } from '../components/Modal';
 import { VehicleForm } from '../components/VehicleForm';
+import { VehiclePhoto } from '../components/VehiclePhoto';
 import { CompactDropdown } from '../components/CompactDropdown';
 import { AppActions, Vehicle } from '../data/appTypes';
 
@@ -109,9 +110,7 @@ export function MyVehicles({ actions, vehicles }: { actions: AppActions; vehicle
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {visibleVehicles.map((vehicle) => (
           <Card key={vehicle.id} padding="none" hover className="overflow-hidden">
-            <div className="h-40 bg-neutral-100 flex items-center justify-center text-neutral-400">
-              <Car size={80} />
-            </div>
+            <VehiclePhoto vehicle={vehicle} className="h-40" />
 
             <div className="p-6">
               <div className="flex items-start justify-between mb-3">
@@ -249,13 +248,13 @@ export function MyVehicles({ actions, vehicles }: { actions: AppActions; vehicle
           id="vehicle-modal-form"
           initialVehicle={editingVehicle}
           onInvalidSubmit={() => actions.toast('error', 'Please complete the required vehicle fields.')}
-          onSubmit={async (vehicle) => {
+          onSubmit={async (vehicle, photoFile, removePhoto) => {
             if (editingVehicle) {
-              const updated = await actions.updateVehicle(vehicle);
-              actions.toast(updated ? 'success' : 'error', updated ? 'Vehicle updated.' : 'Vehicle could not be updated.');
+              const updated = await actions.updateVehicle(vehicle, photoFile, removePhoto);
               if (!updated) return;
+              actions.toast('success', 'Vehicle updated.');
             } else {
-              const saved = await actions.addVehicle(vehicle);
+              const saved = await actions.addVehicle(vehicle, photoFile);
               if (saved) actions.toast('success', `${vehicle.manufacturer} ${vehicle.model} added.`);
               if (!saved) return;
             }

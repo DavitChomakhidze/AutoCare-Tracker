@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
+import { ImagePlus, X } from 'lucide-react';
 import { Input } from './Input';
 import { SearchableDropdown } from './SearchableDropdown';
 import { YearPicker } from './YearPicker';
@@ -22,7 +23,7 @@ export interface VehicleFormValues {
 
 interface VehicleFormProps {
   id: string;
-  onSubmit: (vehicle: Vehicle) => void;
+  onSubmit: (vehicle: Vehicle, photoFile?: File | null, removePhoto?: boolean) => void;
   onValidityChange?: (isValid: boolean) => void;
   onCancel?: () => void;
   onInvalidSubmit?: () => void;
@@ -55,6 +56,9 @@ const initialValues: VehicleFormValues = {
   engine: '',
   color: ''
 };
+
+const vehiclePhotoMaxBytes = 5 * 1024 * 1024;
+const allowedVehiclePhotoTypes = new Set(['image/png', 'image/jpeg', 'image/webp']);
 
 function valuesFromVehicle(vehicle: Vehicle): VehicleFormValues {
   return {
@@ -95,12 +99,18 @@ function makeVehicle(values: VehicleFormValues, initialVehicle?: Vehicle | null)
     dateAdded: initialVehicle?.dateAdded || displayDate,
     lastService: initialVehicle?.lastService || 'No service records yet',
     nextReminder: initialVehicle?.nextReminder || 'No reminder set',
-    status: initialVehicle?.status || 'healthy'
+    status: initialVehicle?.status || 'healthy',
+    photoUrl: initialVehicle?.photoUrl || null,
+    photoPath: initialVehicle?.photoPath || null
   };
 }
 
 export function VehicleForm({ id, onSubmit, onValidityChange, onInvalidSubmit, initialVehicle = null }: VehicleFormProps) {
   const [values, setValues] = useState<VehicleFormValues>(() => (initialVehicle ? valuesFromVehicle(initialVehicle) : initialValues));
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState('');
+  const [removePhoto, setRemovePhoto] = useState(false);
+  const [photoError, setPhotoError] = useState('');
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [manufacturers, setManufacturers] = useState<VehicleMake[]>([]);
   const [models, setModels] = useState<VehicleModel[]>([]);
@@ -130,8 +140,18 @@ export function VehicleForm({ id, onSubmit, onValidityChange, onInvalidSubmit, i
 
   useEffect(() => {
     setValues(initialVehicle ? valuesFromVehicle(initialVehicle) : initialValues);
+    setPhotoFile(null);
+    setPhotoPreviewUrl('');
+    setRemovePhoto(false);
+    setPhotoError('');
     setTouched({});
   }, [initialVehicle]);
+
+  useEffect(() => {
+    return () => {
+      if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    };
+  }, [photoPreviewUrl]);
 
   useEffect(() => {
     let active = true;
@@ -191,6 +211,36 @@ export function VehicleForm({ id, onSubmit, onValidityChange, onInvalidSubmit, i
     setTouched((current) => ({ ...current, [field]: true }));
   };
 
+  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    if (!allowedVehiclePhotoTypes.has(file.type)) {
+      setPhotoError('Vehicle photo must be a PNG, JPG, JPEG, or WEBP image.');
+      return;
+    }
+
+    if (file.size > vehiclePhotoMaxBytes) {
+      setPhotoError('Vehicle photo must be 5MB or smaller.');
+      return;
+    }
+
+    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    setPhotoFile(file);
+    setPhotoPreviewUrl(URL.createObjectURL(file));
+    setRemovePhoto(false);
+    setPhotoError('');
+  };
+
+  const clearPhoto = () => {
+    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    setPhotoFile(null);
+    setPhotoPreviewUrl('');
+    setPhotoError('');
+    setRemovePhoto(Boolean(initialVehicle?.photoUrl || initialVehicle?.photoPath));
+  };
+
   const manufacturerOptions = manufacturers.map((manufacturer) => ({
     value: manufacturer.id,
     label: manufacturer.name
@@ -222,11 +272,55 @@ export function VehicleForm({ id, onSubmit, onValidityChange, onInvalidSubmit, i
       onInvalidSubmit?.();
       return;
     }
-    onSubmit(makeVehicle(values, initialVehicle));
+    const vehicle = makeVehicle(values, initialVehicle);
+    if (removePhoto) {
+      vehicle.photoUrl = null;
+      vehicle.photoPath = null;
+    }
+    onSubmit(vehicle, photoFile, removePhoto);
   };
+
+  const displayedPhotoUrl = photoPreviewUrl || (!removePhoto ? initialVehicle?.photoUrl || '' : '');
 
   return (
     <form id={id} onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="mb-2 block text-sm font-medium">Vehicle photo (optional)</label>
+        <div className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-border bg-neutral-50 p-4 sm:flex-row sm:items-center">
+          <div className="h-28 w-full overflow-hidden rounded-lg bg-card text-neutral-400 ring-1 ring-border sm:w-40">
+            {displayedPhotoUrl ? (
+              <img src={displayedPhotoUrl} alt="Vehicle preview" className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <ImagePlus size={36} />
+              </div>
+            )}
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-muted-foreground mb-3">PNG, JPG, JPEG, or WEBP up to 5MB.</p>
+            <div className="flex flex-wrap gap-2">
+              <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-[var(--radius-button)] border border-input bg-card px-4 text-sm font-medium transition-colors hover:bg-accent">
+                {displayedPhotoUrl ? 'Change photo' : 'Upload photo'}
+                <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={handlePhotoChange} />
+              </label>
+              {displayedPhotoUrl && (
+                <button
+                  type="button"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-[var(--radius-button)] border border-danger-500/20 bg-danger-50 px-4 text-sm font-medium text-danger-700 transition-colors hover:border-danger-500/40"
+                  onClick={clearPhoto}
+                >
+                  <X size={16} />
+                  Remove
+                </button>
+              )}
+            </div>
+            {photoFile && <p className="mt-2 text-xs text-muted-foreground">Selected for upload when you save.</p>}
+            {removePhoto && !photoFile && <p className="mt-2 text-xs text-muted-foreground">Photo will be removed when you save.</p>}
+            {photoError && <p className="mt-2 text-sm text-destructive">{photoError}</p>}
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <SearchableDropdown
           label="Vehicle manufacturer"

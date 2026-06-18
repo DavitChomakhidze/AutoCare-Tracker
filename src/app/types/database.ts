@@ -42,6 +42,8 @@ export interface Database {
           transmission: string | null;
           engine_size: string | null;
           color: string | null;
+          photo_url: string | null;
+          photo_path: string | null;
           date_added: string;
           last_service: string;
           next_reminder: string;
@@ -64,6 +66,8 @@ export interface Database {
           transmission?: string | null;
           engine_size?: string | null;
           color?: string | null;
+          photo_url?: string | null;
+          photo_path?: string | null;
           date_added?: string;
           last_service?: string;
           next_reminder?: string;

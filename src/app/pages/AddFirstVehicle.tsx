@@ -20,8 +20,8 @@ export function AddFirstVehicle({ actions }: { actions: AppActions }) {
           <VehicleForm
             id="add-first-vehicle-form"
             onInvalidSubmit={() => actions.toast('error', 'Please complete the required vehicle fields.')}
-            onSubmit={async (vehicle) => {
-              const saved = await actions.addVehicle(vehicle);
+            onSubmit={async (vehicle, photoFile) => {
+              const saved = await actions.addVehicle(vehicle, photoFile);
               if (saved) {
                 actions.toast('success', `${vehicle.manufacturer} ${vehicle.model} added.`);
                 actions.navigate('vehicles');

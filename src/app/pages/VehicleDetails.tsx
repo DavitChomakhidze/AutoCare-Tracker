@@ -8,6 +8,7 @@ import { AppActions, Reminder, ServiceRecord, Vehicle, money, vehicleName } from
 import { getReminderViews, sortByUrgency } from '../utils/reminders';
 import { countMonthsInRange, formatCurrency, toExpenseRecords } from '../utils/expenses';
 import { VehicleForm } from '../components/VehicleForm';
+import { VehiclePhoto } from '../components/VehiclePhoto';
 
 const tabs = ['Overview', 'Service History', 'Reminders', 'Expenses'];
 
@@ -80,9 +81,7 @@ export function VehicleDetails({
 
       <Card>
         <div className="flex flex-col gap-6 lg:flex-row">
-          <div className="w-full lg:w-64 h-48 bg-neutral-100 rounded-lg flex items-center justify-center text-neutral-400">
-            <Car size={96} />
-          </div>
+          <VehiclePhoto vehicle={vehicle} className="h-48 w-full rounded-lg lg:w-64" iconSize={96} />
 
           <div className="flex-1">
             <div className="flex items-start justify-between mb-4">
@@ -444,10 +443,11 @@ export function VehicleDetails({
           id="vehicle-details-edit-form"
           initialVehicle={vehicle}
           onValidityChange={setEditFormValid}
-          onSubmit={async (updatedVehicle) => {
-            const updated = await actions.updateVehicle(updatedVehicle);
-            actions.toast(updated ? 'success' : 'error', updated ? 'Vehicle changes saved.' : 'Vehicle could not be updated.');
-            if (updated) setShowEdit(false);
+          onSubmit={async (updatedVehicle, photoFile, removePhoto) => {
+            const updated = await actions.updateVehicle(updatedVehicle, photoFile, removePhoto);
+            if (!updated) return;
+            actions.toast('success', 'Vehicle changes saved.');
+            setShowEdit(false);
           }}
         />
       </Modal>

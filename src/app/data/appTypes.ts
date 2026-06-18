@@ -45,8 +45,8 @@ export interface AppActions {
   deleteAllData: () => Promise<boolean>;
   logout: () => Promise<void>;
   toast: (type: ToastType, message: string) => void;
-  addVehicle: (vehicle: Vehicle) => Promise<boolean>;
-  updateVehicle: (vehicle: Vehicle) => Promise<boolean>;
+  addVehicle: (vehicle: Vehicle, photoFile?: File | null) => Promise<boolean>;
+  updateVehicle: (vehicle: Vehicle, photoFile?: File | null, removePhoto?: boolean) => Promise<boolean>;
   deleteVehicle: (vehicleId: string) => Promise<boolean>;
   addService: (record: ServiceRecord) => Promise<boolean>;
   updateService: (record: ServiceRecord) => Promise<boolean>;
@@ -78,6 +78,8 @@ export interface Vehicle {
   lastService: string;
   nextReminder: string;
   status: 'healthy' | 'needs-attention';
+  photoUrl?: string | null;
+  photoPath?: string | null;
 }
 
 export interface ServiceRecord {

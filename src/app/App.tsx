@@ -38,7 +38,7 @@ import {
   updateProfile as updateAccountProfile,
   uploadAvatar
 } from './services/authService';
-import { createVehicle, deleteVehicle, getVehicles, updateVehicle } from './services/vehicleService';
+import { createVehicle, deleteVehicle, getVehicles, removeVehiclePhoto, updateVehicle, uploadVehiclePhoto } from './services/vehicleService';
 import {
   createServiceRecord,
   deleteServiceRecord,
@@ -275,6 +275,12 @@ function notificationIcon(notification: AppNotification) {
   }
 
   return <Bell size={20} />;
+}
+
+function assertVehiclePhotoSaved(vehicle: Vehicle, uploadedPhoto: { path: string; url: string | null }) {
+  if (vehicle.photoPath !== uploadedPhoto.path || !vehicle.photoUrl) {
+    throw new Error('Photo uploaded, but the vehicle photo fields were not saved. Please try again.');
+  }
 }
 
 export default function App() {
@@ -697,7 +703,7 @@ export default function App() {
         if (signedOut) setToast({ type: 'info', message: 'You have been logged out.' });
       },
       toast: (type, message) => setToast({ type, message }),
-      addVehicle: async (vehicle) => {
+      addVehicle: async (vehicle, photoFile) => {
         if (!session) {
           setToast({ type: 'warning', message: 'Please log in before saving vehicles.' });
           showPage('login');
@@ -707,13 +713,35 @@ export default function App() {
         const freshSession = await requireFreshSession();
         if (!freshSession) return false;
 
+        let uploadedPhoto: { path: string; url: string | null } | null = null;
+
         try {
-          const savedVehicle = await createVehicle(vehicle, freshSession.user.id);
+          let savedVehicle = await createVehicle(vehicle, freshSession.user.id);
+
+          if (photoFile) {
+            uploadedPhoto = await uploadVehiclePhoto(freshSession.user.id, savedVehicle.id, photoFile);
+            savedVehicle = await updateVehicle(
+              {
+                ...savedVehicle,
+                photoUrl: uploadedPhoto.url,
+                photoPath: uploadedPhoto.path
+              },
+              freshSession.user.id
+            );
+            assertVehiclePhotoSaved(savedVehicle, uploadedPhoto);
+          }
+
           const nextVehicles = await getVehicles(freshSession.user.id);
           setVehicles(nextVehicles);
           setSelectedVehicleId(savedVehicle.id);
           return true;
         } catch (error) {
+          if (uploadedPhoto) {
+            await removeVehiclePhoto(uploadedPhoto.path).catch((cleanupError) => {
+              console.error('Vehicle photo cleanup failed after save error', cleanupError);
+            });
+          }
+          console.error('Vehicle save failed', error);
           setToast({
             type: 'error',
             message: isNetworkError(error)
@@ -723,25 +751,67 @@ export default function App() {
           return false;
         }
       },
-      updateVehicle: async (updatedVehicle) => {
+      updateVehicle: async (updatedVehicle, photoFile, removePhoto = false) => {
         const freshSession = await requireFreshSession();
-        if (!freshSession || !vehicles.some((vehicle) => vehicle.id === updatedVehicle.id)) return false;
+        const existingVehicle = vehicles.find((vehicle) => vehicle.id === updatedVehicle.id);
+        if (!freshSession || !existingVehicle) return false;
+        let uploadedPhoto: { path: string; url: string | null } | null = null;
+
         try {
-          const savedVehicle = await updateVehicle(updatedVehicle, freshSession.user.id);
+          let savedVehicle = await updateVehicle(
+            removePhoto
+              ? {
+                ...updatedVehicle,
+                photoUrl: null,
+                photoPath: null
+              }
+              : updatedVehicle,
+            freshSession.user.id
+          );
+
+          if (removePhoto && existingVehicle.photoPath) {
+            await removeVehiclePhoto(existingVehicle.photoPath);
+          }
+
+          if (photoFile) {
+            uploadedPhoto = await uploadVehiclePhoto(freshSession.user.id, savedVehicle.id, photoFile);
+            savedVehicle = await updateVehicle(
+              {
+                ...savedVehicle,
+                photoUrl: uploadedPhoto.url,
+                photoPath: uploadedPhoto.path
+              },
+              freshSession.user.id
+            );
+            assertVehiclePhotoSaved(savedVehicle, uploadedPhoto);
+
+            if (existingVehicle.photoPath && existingVehicle.photoPath !== uploadedPhoto.path) {
+              await removeVehiclePhoto(existingVehicle.photoPath);
+            }
+          }
+
           setVehicles((currentVehicles) =>
             currentVehicles.map((vehicle) => (vehicle.id === savedVehicle.id ? savedVehicle : vehicle))
           );
           return true;
         } catch (error) {
+          if (uploadedPhoto) {
+            await removeVehiclePhoto(uploadedPhoto.path).catch((cleanupError) => {
+              console.error('Vehicle photo cleanup failed after update error', cleanupError);
+            });
+          }
+          console.error('Vehicle update failed', error);
           setToast({ type: 'error', message: `Vehicle could not be updated: ${errorMessage(error)}` });
           return false;
         }
       },
       deleteVehicle: async (vehicleId) => {
         const freshSession = await requireFreshSession();
-        if (!freshSession || !vehicles.some((vehicle) => vehicle.id === vehicleId)) return false;
+        const vehicleToDelete = vehicles.find((vehicle) => vehicle.id === vehicleId);
+        if (!freshSession || !vehicleToDelete) return false;
         try {
           await deleteVehicle(vehicleId, freshSession.user.id);
+          await removeVehiclePhoto(vehicleToDelete.photoPath);
           const nextVehicles = vehicles.filter((vehicle) => vehicle.id !== vehicleId);
           setVehicles(nextVehicles);
           setServiceRecords((currentRecords) => currentRecords.filter((record) => record.vehicleId !== vehicleId));

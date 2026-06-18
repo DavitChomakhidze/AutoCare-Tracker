@@ -5,6 +5,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.su
 const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'placeholder-key';
 const devOrigin = typeof window !== 'undefined' ? window.location.origin : '';
 const supabaseClientUrl = import.meta.env.DEV && devOrigin ? `${devOrigin}/supabase` : supabaseUrl;
+export const supabaseProjectUrl = supabaseUrl;
 const projectRef = new URL(supabaseUrl).hostname.split('.')[0] || 'autocare';
 export const authStorageKey = `sb-${projectRef}-auth-token`;
 const authRememberPreferenceKey = `autocare-${projectRef}-remember-auth`;
@@ -112,5 +113,13 @@ export const supabase = createClient<Database>(supabaseClientUrl, supabasePublis
   auth: {
     storageKey: authStorageKey,
     storage: authStorage
+  }
+});
+
+export const supabasePublicStorage = createClient<Database>(supabaseProjectUrl, supabasePublishableKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false
   }
 });
