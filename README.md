@@ -2,8 +2,7 @@
 
 AutoCare is a responsive web application that helps vehicle owners keep their maintenance information in one place. Users can register vehicles, record completed services and costs, attach receipts, schedule date- or mileage-based reminders, review upcoming and overdue work, and analyse expenses.
 
-> Bachelor project, Caucasus University — Caucasus School of Technology<br>
-> Student: `[Name and surname]` · Supervisor: `[Name and surname]` · Academic year: `2025–2026`
+> Bachelor project developed at Caucasus University, Caucasus School of Technology, during the 2025–2026 academic year.
 
 ## Project overview
 
@@ -108,7 +107,7 @@ AutoCare/
 ### 1. Install dependencies
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/DavitChomakhidze/AutoCare-Tracker.git
 cd AutoCare
 npm install
 ```
