@@ -115,7 +115,7 @@ export function CompactDropdown({
     createPortal(
       <div
         ref={menuRef}
-        className="fixed z-[70] rounded-[var(--radius-card)] border border-border bg-card/95 backdrop-blur shadow-xl overflow-y-auto p-1"
+        className="fixed z-[1150] rounded-[var(--radius-card)] border border-border bg-card/95 backdrop-blur shadow-xl overflow-y-auto p-1"
         style={{ left: menuStyle.left, top: menuStyle.top, width: menuStyle.width, maxHeight: menuStyle.maxHeight }}
         onKeyDown={handleKeyDown}
       >
