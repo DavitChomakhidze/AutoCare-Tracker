@@ -281,7 +281,16 @@ export function VehicleDetails({
             </div>
           ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[940px] table-fixed">
+              <colgroup>
+                <col className="w-[120px]" />
+                <col className="w-[170px]" />
+                <col className="w-[140px]" />
+                <col className="w-[170px]" />
+                <col className="w-[110px]" />
+                <col className="w-[130px]" />
+                <col className="w-[100px]" />
+              </colgroup>
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
@@ -301,7 +310,7 @@ export function VehicleDetails({
                     <td className="py-3 px-4">{record.mileage.toLocaleString()} km</td>
                     <td className="py-3 px-4">{record.workshop}</td>
                     <td className="py-3 px-4">{money(record.cost)}</td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4 whitespace-nowrap">
                       <Badge variant={record.status}>
                         {record.status === 'completed' ? 'Completed' : 'Scheduled'}
                       </Badge>

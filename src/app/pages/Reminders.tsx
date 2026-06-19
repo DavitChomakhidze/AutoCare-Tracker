@@ -376,11 +376,14 @@ export function Reminders({
         isOpen={Boolean(completeReminder)}
         onClose={() => setCompleteReminder(null)}
         title="Complete reminder"
+        size="lg"
+        panelClassName="w-[min(95vw,560px)] max-w-[560px]"
         footer={
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Button variant="outline" onClick={() => setCompleteReminder(null)}>Cancel</Button>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)]">
+            <Button variant="outline" className="w-full whitespace-nowrap sm:w-auto" onClick={() => setCompleteReminder(null)}>Cancel</Button>
             <Button
               variant="secondary"
+              className="w-full whitespace-nowrap"
               onClick={async () => {
                 if (completeReminder && (await actions.completeReminder(completeReminder.id))) {
                   actions.toast('success', 'Reminder marked as completed.');
@@ -393,6 +396,7 @@ export function Reminders({
               Mark completed only
             </Button>
             <Button
+              className="w-full whitespace-nowrap"
               onClick={async () => {
                 if (completeReminder) await actions.completeReminder(completeReminder.id);
                 setCompleteReminder(null);

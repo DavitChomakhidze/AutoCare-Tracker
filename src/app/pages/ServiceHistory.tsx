@@ -224,15 +224,15 @@ export function ServiceHistory({
           </div>
         ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] table-fixed">
+          <table className="w-full min-w-[1210px] table-fixed">
             <colgroup>
-              <col className="w-[12%]" />
-              <col className="w-[18%]" />
-              <col className="w-[16%]" />
-              <col className="w-[13%]" />
-              <col className="w-[16%]" />
-              <col className="w-[10%]" />
-              <col className="w-[10%]" />
+              <col className="w-[120px]" />
+              <col className="w-[190px]" />
+              <col className="w-[170px]" />
+              <col className="w-[140px]" />
+              <col className="w-[170px]" />
+              <col className="w-[110px]" />
+              <col className="w-[130px]" />
               <col className="w-[180px]" />
             </colgroup>
             <thead>
@@ -263,12 +263,12 @@ export function ServiceHistory({
                   <td className="py-4 px-4 whitespace-nowrap">{record.mileage.toLocaleString()} km</td>
                   <td className="py-4 px-4 truncate">{record.workshop}</td>
                   <td className="py-4 px-4 font-semibold whitespace-nowrap">{money(record.cost)}</td>
-                  <td className="py-4 px-4">
+                  <td className="py-4 px-4 whitespace-nowrap">
                     <Badge variant={record.status}>
                       {record.status === 'completed' ? 'Completed' : 'Scheduled'}
                     </Badge>
                   </td>
-                  <td className="py-4 px-4">
+                  <td className="py-4 px-4 whitespace-nowrap">
                     <div className="flex gap-2">
                       <Button variant="ghost" size="sm" onClick={() => setSelectedRecordId(record.id)}>View</Button>
                       <Button variant="ghost" size="sm" onClick={() => actions.editServiceRecord(record.id)}>Edit</Button>
